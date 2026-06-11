@@ -1,0 +1,20 @@
+[
+  {
+    "type": "image",
+    "src": "images/gaya-hero.jpg",
+    "title": "אימון בשטח — רגעים מהעבודה",
+    "desc": "כל אימון הוא עולם: כלב אחר, משפחה אחרת, סיפור אחר."
+  },
+  {
+    "type": "image",
+    "src": "images/kahu-poster.jpg",
+    "title": "KAHU — הדרך שלי",
+    "desc": "חינוך. תקשורת. חופש. והרבה אהבה."
+  },
+  {
+    "type": "image",
+    "src": "images/podcast-cover.jpg",
+    "title": "מאחורי הקלעים של הפודקאסט",
+    "desc": "משני הצדדים של הרצועה — פרק חדש כל שבועיים."
+  }
+]
