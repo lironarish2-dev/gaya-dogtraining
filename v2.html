@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>גאיה דניאל · דרך הקאהו — גרסה צבעונית (אופציה ב')</title>
+<meta name="description" content="גאיה דניאל — מאמנת כלבים. אילוף וליווי אישי לבעלים ולכלב.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800;900&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:        hsl(40, 50%, 99%);
+    --ink:       hsl(235, 25%, 16%);
+    --ink-soft:  hsl(235, 12%, 38%);
+    --ink-faint: hsl(235, 8%, 55%);
+    --coral:     hsl(16, 88%, 56%);
+    --coral-dk:  hsl(16, 78%, 46%);
+    --peach:     hsl(24, 100%, 94%);
+    --sun:       hsl(45, 95%, 60%);
+    --sun-soft:  hsl(46, 95%, 90%);
+    --mint:      hsl(160, 50%, 90%);
+    --sky:       hsl(205, 75%, 92%);
+
+    --fs-body:    clamp(1rem, .95rem + .25vw, 1.125rem);
+    --fs-small:   .9rem;
+    --fs-tiny:    .8rem;
+    --fs-h3:      clamp(1.3rem, 1.1rem + .9vw, 1.7rem);
+    --fs-h2:      clamp(1.9rem, 1.4rem + 2vw, 3rem);
+    --fs-display: clamp(2.6rem, 1.7rem + 4.5vw, 5rem);
+
+    --s1:.5rem; --s2:1rem; --s3:1.5rem; --s4:2rem; --s6:3rem; --s8:4rem; --s12:6rem; --s14:7rem;
+    --r:20px; --r-lg:32px;
+    --shadow:6px 6px 0 var(--ink);
+    --shadow-sm:3px 3px 0 var(--ink);
+    --container:1160px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;overflow-x:clip}
+  body{
+    font-family:'Heebo',system-ui,sans-serif;
+    font-size:var(--fs-body);line-height:1.65;
+    color:var(--ink);background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Rubik',sans-serif;line-height:1.12;letter-spacing:-.015em}
+  img{max-width:100%;display:block}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:var(--container);margin-inline:auto;padding-inline:clamp(1.25rem,4vw,2.5rem)}
+
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.no-anim{transition:none}
+  @media(prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .marquee-track{animation:none!important}
+    html{scroll-behavior:auto}
+  }
+
+  header{
+    position:fixed;inset-inline:0;top:0;z-index:50;
+    background:hsla(40,50%,99%,.85);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-bottom:2px solid transparent;transition:border-color .3s;
+  }
+  header.scrolled{border-bottom-color:var(--ink)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{font-family:'Rubik',sans-serif;font-weight:900;font-size:1.25rem}
+  .logo .paw{display:inline-block;transform:rotate(-15deg)}
+  .nav-links{display:flex;gap:var(--s4);align-items:center;font-weight:600;font-size:.95rem}
+  .nav-links a:not(.btn){color:var(--ink-soft);transition:color .2s}
+  .nav-links a:not(.btn):hover{color:var(--coral)}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:.5rem;
+    font-family:'Rubik',sans-serif;font-weight:700;font-size:1rem;
+    background:var(--coral);color:#fff;
+    padding:.75rem 1.6rem;border-radius:99px;
+    border:2px solid var(--ink);box-shadow:var(--shadow-sm);
+    transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+  .btn-lg{padding:1rem 2.2rem;font-size:1.1rem}
+  .btn-light{background:#fff;color:var(--ink)}
+  .btn-sun{background:var(--sun);color:var(--ink)}
+  @media(max-width:780px){.nav-links a:not(.btn){display:none}}
+
+  .hero{padding-top:calc(72px + var(--s8));padding-bottom:var(--s8);position:relative}
+  .hero-blob{position:absolute;z-index:-1;border-radius:50%;filter:blur(70px);opacity:.55}
+  .hero-blob.b1{width:480px;height:480px;background:var(--peach);top:-80px;inset-inline-end:-120px}
+  .hero-blob.b2{width:380px;height:380px;background:var(--sun-soft);bottom:-120px;inset-inline-start:-100px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:var(--s8);align-items:center}
+  .hero h1{font-size:var(--fs-display);font-weight:900;margin-bottom:var(--s3)}
+  .hero h1 .hl{
+    background:linear-gradient(transparent 58%, var(--sun) 58%, var(--sun) 92%, transparent 92%);
+    padding-inline:.1em;
+  }
+  .hero .lead{font-size:1.25rem;color:var(--ink-soft);max-width:30ch;margin-bottom:var(--s4);font-weight:500}
+  .hero-ctas{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center}
+  .hero-note{font-size:var(--fs-small);color:var(--ink-faint);margin-top:var(--s2)}
+
+  .hero-visual{position:relative;justify-self:center;width:min(100%,440px)}
+  .hero-img{
+    width:100%;aspect-ratio:4/5;object-fit:cover;
+    border-radius:220px 220px var(--r-lg) var(--r-lg);
+    border:3px solid var(--ink);box-shadow:8px 8px 0 var(--coral);
+  }
+  .sticker{
+    position:absolute;background:#fff;border:2px solid var(--ink);border-radius:14px;
+    padding:.55rem 1rem;font-weight:700;font-size:var(--fs-small);
+    box-shadow:var(--shadow-sm);white-space:nowrap;
+  }
+  .sticker.s1{top:9%;inset-inline-start:-7%;transform:rotate(6deg);background:var(--sun)}
+  .sticker.s2{bottom:18%;inset-inline-end:-9%;transform:rotate(-5deg);background:var(--mint)}
+  .sticker.s3{bottom:-4%;inset-inline-start:6%;transform:rotate(3deg)}
+  @media(max-width:880px){
+    .hero-grid{grid-template-columns:1fr;gap:var(--s6)}
+    .sticker.s1{inset-inline-start:-2%}
+    .sticker.s2{inset-inline-end:-2%}
+  }
+
+  .marquee{
+    background:var(--ink);color:var(--bg);
+    padding:.8rem 0;overflow:hidden;
+    border-block:2px solid var(--ink);
+    transform:rotate(-1deg) scale(1.02);margin-block:var(--s4);
+  }
+  .marquee-track{
+    display:flex;gap:2.5rem;width:max-content;
+    font-family:'Rubik',sans-serif;font-weight:700;font-size:1.05rem;
+    animation:scroll 28s linear infinite;
+  }
+  .marquee-track span{display:flex;align-items:center;gap:2.5rem;white-space:nowrap}
+  .marquee-track .dot{color:var(--sun)}
+  @keyframes scroll{to{transform:translateX(50%)}}
+
+  section{padding-block:var(--s14)}
+  @media(max-width:780px){section{padding-block:var(--s8)}}
+  .kicker{
+    display:inline-block;font-family:'Rubik',sans-serif;font-weight:700;font-size:var(--fs-small);
+    background:var(--peach);border:2px solid var(--ink);border-radius:99px;
+    padding:.35rem 1.1rem;margin-bottom:var(--s2);box-shadow:var(--shadow-sm);
+  }
+  .sec-head{max-width:62ch;margin-bottom:var(--s6)}
+  .sec-head h2{font-size:var(--fs-h2);font-weight:900;margin-bottom:var(--s2)}
+  .sec-head p{color:var(--ink-soft);font-size:1.15rem}
+
+  .about{background:var(--peach);border-block:2px solid var(--ink)}
+  .about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:var(--s8);align-items:center}
+  .about-img-wrap{position:relative;width:min(100%,400px);justify-self:center}
+  .about-img{
+    width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-lg);
+    border:3px solid var(--ink);box-shadow:8px 8px 0 var(--sun);
+  }
+  .about h2{font-size:var(--fs-h2);font-weight:900;margin-bottom:var(--s2)}
+  .about p{color:var(--ink-soft);margin-bottom:var(--s2);max-width:55ch}
+  .about p b{color:var(--ink)}
+  .kahu-tip{
+    background:#fff;border:2px solid var(--ink);border-radius:var(--r);
+    padding:var(--s2) var(--s3);box-shadow:var(--shadow-sm);
+    margin-top:var(--s3);max-width:48ch;
+  }
+  .kahu-tip b{font-family:'Rubik',sans-serif}
+  .kahu-tip small{color:var(--ink-faint)}
+  @media(max-width:880px){.about-grid{grid-template-columns:1fr}}
+
+  .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3)}
+  .service-card{
+    border:2px solid var(--ink);border-radius:var(--r);
+    padding:var(--s4);display:flex;flex-direction:column;gap:var(--s2);
+    box-shadow:var(--shadow);transition:transform .2s;
+    background:#fff;
+  }
+  .service-card:nth-child(1){background:var(--mint)}
+  .service-card:nth-child(2){background:var(--sun-soft)}
+  .service-card:nth-child(3){background:var(--sky)}
+  .service-card:hover{transform:translate(-3px,-3px) rotate(-.5deg)}
+  .service-card .emoji{font-size:2.2rem}
+  .service-card h3{font-size:var(--fs-h3);font-weight:800}
+  .service-card p{color:var(--ink-soft);flex:1}
+  .service-card .more{font-weight:700;font-size:var(--fs-small);display:inline-flex;gap:.4rem;align-items:center}
+  @media(max-width:880px){.service-grid{grid-template-columns:1fr}}
+
+  .podcast{background:var(--ink);color:var(--bg);border-block:2px solid var(--ink)}
+  .podcast .kicker{background:var(--sun);box-shadow:3px 3px 0 hsla(40,50%,99%,.25)}
+  .podcast-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s8);align-items:center}
+  .podcast h2{font-size:var(--fs-h2);font-weight:900;margin-bottom:var(--s2);color:#fff}
+  .podcast .desc{color:hsla(40,50%,96%,.7);font-size:1.1rem;margin-bottom:var(--s3);max-width:50ch}
+  .pod-stats{display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s4)}
+  .pod-pill{
+    background:hsla(40,50%,99%,.08);border:2px solid hsla(40,50%,99%,.25);
+    border-radius:99px;padding:.45rem 1.2rem;font-weight:600;font-size:var(--fs-small);
+  }
+  .pod-pill b{color:var(--sun)}
+  .pod-art{
+    aspect-ratio:1;max-width:420px;width:100%;justify-self:center;
+    background:linear-gradient(135deg, var(--coral) 0%, hsl(30,90%,55%) 55%, var(--sun) 100%);
+    border-radius:var(--r-lg);border:3px solid var(--bg);
+    box-shadow:10px 10px 0 hsla(16,88%,56%,.35);
+    padding:var(--s4);display:flex;flex-direction:column;justify-content:space-between;
+    transform:rotate(2deg);
+  }
+  .pod-art .mic{font-size:2.6rem}
+  .pod-art .t{font-family:'Rubik',sans-serif;font-weight:900;font-size:clamp(1.6rem,2.6vw,2.2rem);line-height:1.15;color:var(--ink)}
+  .pod-art .h{font-weight:600;color:hsla(235,25%,16%,.75);margin-top:.6rem;font-size:.95rem}
+  .ep-row{display:flex;flex-direction:column;gap:var(--s1);margin-bottom:var(--s4)}
+  .ep{
+    display:flex;align-items:center;gap:var(--s2);
+    background:hsla(40,50%,99%,.06);border:2px solid hsla(40,50%,99%,.18);
+    border-radius:14px;padding:.7rem var(--s2);font-weight:500;
+    transition:background .2s, transform .2s;
+  }
+  .ep:hover{background:hsla(40,50%,99%,.14);transform:translateX(-4px)}
+  .ep .pl{width:32px;height:32px;flex:none;border-radius:50%;background:var(--sun);color:var(--ink);display:grid;place-items:center;font-size:.65rem;border:2px solid var(--ink)}
+  @media(max-width:880px){.podcast-grid{grid-template-columns:1fr}}
+
+  .chat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);align-items:start}
+  .chat{border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);background:#fff}
+  .chat-top{
+    display:flex;align-items:center;gap:.7rem;
+    background:var(--mint);border-bottom:2px solid var(--ink);
+    padding:.7rem var(--s2);font-weight:700;font-size:var(--fs-small);
+  }
+  .chat-top .avatar{width:34px;height:34px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:grid;place-items:center}
+  .chat-top small{display:block;font-weight:400;color:var(--ink-soft);font-size:var(--fs-tiny)}
+  .chat-body{padding:var(--s2);display:flex;flex-direction:column;gap:.6rem;background:hsl(40,40%,97%)}
+  .bubble{
+    background:#fff;border:2px solid var(--ink);border-radius:16px 16px 16px 4px;
+    padding:.7rem 1rem;font-size:.95rem;color:var(--ink-soft);max-width:95%;
+  }
+  .bubble.me{
+    background:var(--sun-soft);border-radius:16px 16px 4px 16px;align-self:flex-end;
+    color:var(--ink);font-weight:500;
+  }
+  @media(max-width:880px){.chat-grid{grid-template-columns:1fr}}
+
+  .faq-wrap{max-width:780px;margin-inline:auto}
+  details{
+    border:2px solid var(--ink);border-radius:var(--r);
+    margin-bottom:var(--s2);background:#fff;
+    box-shadow:var(--shadow-sm);overflow:hidden;
+  }
+  details[open]{background:var(--sun-soft)}
+  summary{
+    cursor:pointer;font-weight:700;font-size:1.05rem;font-family:'Rubik',sans-serif;
+    padding:var(--s2) var(--s3);
+    list-style:none;display:flex;justify-content:space-between;align-items:center;gap:var(--s2);
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"↓";font-size:1.1rem;transition:transform .25s;flex:none}
+  details[open] summary::after{transform:rotate(180deg)}
+  details p{padding:0 var(--s3) var(--s3);color:var(--ink-soft);max-width:65ch}
+
+  .final{
+    background:var(--coral);border-block:2px solid var(--ink);
+    text-align:center;padding-block:var(--s12);
+    position:relative;overflow:hidden;
+  }
+  .final h2{font-size:var(--fs-h2);font-weight:900;color:#fff;max-width:22ch;margin:0 auto var(--s2)}
+  .final p{color:hsla(0,0%,100%,.85);max-width:44ch;margin:0 auto var(--s4);font-size:1.15rem}
+  .final .paws{position:absolute;font-size:5rem;opacity:.12;user-select:none}
+  .final .paws.p1{top:8%;inset-inline-start:6%;transform:rotate(-20deg)}
+  .final .paws.p2{bottom:10%;inset-inline-end:7%;transform:rotate(15deg)}
+
+  footer.site{padding:var(--s4) 0;color:var(--ink-faint);font-size:var(--fs-small)}
+  .footer-grid{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);flex-wrap:wrap}
+  footer.site a{color:var(--ink-soft);font-weight:600}
+  footer.site a:hover{color:var(--coral)}
+
+  .wa-float{
+    position:fixed;bottom:22px;inset-inline-start:22px;z-index:60;
+    width:58px;height:58px;border-radius:50%;
+    background:hsl(142,70%,42%);color:#fff;
+    border:2px solid var(--ink);box-shadow:var(--shadow-sm);
+    display:grid;place-items:center;transition:transform .2s;
+  }
+  .wa-float:hover{transform:scale(1.1) rotate(8deg)}
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="container nav">
+    <a class="logo" href="#top"><span class="paw">🐾</span> גאיה · דרך הקאהו</a>
+    <nav class="nav-links">
+      <a href="#about">מי אני</a>
+      <a href="#services">איך עובדים</a>
+      <a href="#podcast">הפודקאסט</a>
+      <a href="#faq">שאלות</a>
+      <a class="btn" href="https://wa.me/9725XXXXXXXX?text=היי%20גאיה%2C%20אשמח%20לשמוע%20על%20הליווי%20שלך" target="_blank" rel="noopener">בואו נדבר 💬</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-blob b1"></div>
+  <div class="hero-blob b2"></div>
+  <div class="container hero-grid">
+    <div>
+      <h1>הכלב שלכם לא צריך תיקון.<br>הוא צריך <span class="hl">שתבינו אותו.</span></h1>
+      <p class="lead">אילוף וליווי אישי בדרך הקאהו — לכלב ולבני האדם שלו. בלי צעקות, עם המון חיבור.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-lg" href="https://wa.me/9725XXXXXXXX?text=היי%20גאיה%2C%20אשמח%20לשמוע%20על%20הליווי%20שלך" target="_blank" rel="noopener">דברו איתי בוואטסאפ</a>
+        <a class="btn btn-lg btn-light" href="#podcast">🎙️ לפודקאסט שלי</a>
+      </div>
+      <p class="hero-note">★ 5.0 · הפודקאסט "משני הצדדים של הרצועה"</p>
+    </div>
+    <div class="hero-visual">
+      <img class="hero-img" src="images/gaya-hero.jpg" alt="גאיה מחזיקה כלב בשדה" width="440" height="550">
+      <span class="sticker s1">בדרך הקאהו 💛</span>
+      <span class="sticker s2">גם גורים, גם בוגרים</span>
+      <span class="sticker s3">🐾 גאיה דניאל</span>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>חיבור <i class="dot">✦</i> אמון <i class="dot">✦</i> גבולות באהבה <i class="dot">✦</i> משחק <i class="dot">✦</i> שפה משותפת <i class="dot">✦</i> סבלנות <i class="dot">✦</i> כלב רגוע, בית רגוע <i class="dot">✦</i></span>
+    <span>חיבור <i class="dot">✦</i> אמון <i class="dot">✦</i> גבולות באהבה <i class="dot">✦</i> משחק <i class="dot">✦</i> שפה משותפת <i class="dot">✦</i> סבלנות <i class="dot">✦</i> כלב רגוע, בית רגוע <i class="dot">✦</i></span>
+  </div>
+</div>
+
+<section class="about" id="about">
+  <div class="container about-grid">
+    <div class="about-img-wrap reveal">
+      <img class="about-img" src="images/kahu-poster.jpg" alt="גאיה דניאל — KAHU אילוף כלבים">
+    </div>
+    <div class="reveal">
+      <span class="kicker">מי אני 🐕</span>
+      <h2>נעים להכיר, גאיה דניאל.</h2>
+      <p>אני מאמנת כלבים, ואני הולכת להגיד לכם משהו שאולי יפתיע: <b>רוב העבודה שלי היא בכלל עם בני אדם.</b></p>
+      <p>כי כלב שמושך ברצועה, נובח על כל דבר שזז או הופך את הסלון — הוא לא כלב "רע". הוא כלב שמנסה להגיד משהו, ואף אחד עוד לא לימד אתכם להקשיב. שם אני נכנסת לתמונה: מתרגמת, מסדרת, ובונה איתכם שגרה שעובדת לשני הצדדים של הרצועה.</p>
+      <div class="kahu-tip">
+        💡 <b>למה "דרך הקאהו"?</b> קאהו (Kahu) בהוואית = שומר. מי שהופקד על משהו יקר. <small>זה בדיוק מה שאתם בשביל הכלב שלכם — וזו הדרך שלי.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="kicker">איך עובדים יחד ✨</span>
+      <h2>שלושה מסלולים. מטרה אחת: שיהיה לכם כיף ביחד.</h2>
+    </div>
+    <div class="service-grid">
+      <article class="service-card reveal">
+        <span class="emoji">🐶</span>
+        <h3>גורים — להתחיל ברגל ימין</h3>
+        <p>הרגלי ניקיון, חִברוּת, לבד בבית בלי דרמות. החודשים הראשונים קובעים הכל — בואו נעשה אותם נכון.</p>
+        <span class="more">מתאים מגיל חודשיים ←</span>
+      </article>
+      <article class="service-card reveal">
+        <span class="emoji">💪</span>
+        <h3>בעיות התנהגות</h3>
+        <p>משיכה ברצועה, נביחות, חרדת נטישה, תוקפנות. נבין מה מפעיל את הכלב — ונבנה תוכנית שעובדת באמת.</p>
+        <span class="more">פגישת אבחון + תוכנית אישית ←</span>
+      </article>
+      <article class="service-card reveal">
+        <span class="emoji">🏡</span>
+        <h3>ליווי משפחתי מלא</h3>
+        <p>מפגשים קבועים אצלכם בבית, זמינות מלאה ביניהם, וכלים שנשארים אצלכם לכל החיים. המסלול הכי מבוקש.</p>
+        <span class="more">כולל ליווי בוואטסאפ ←</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="podcast" id="podcast">
+  <div class="container podcast-grid">
+    <div class="pod-art reveal">
+      <span class="mic">🎙️</span>
+      <div>
+        <div class="t">משני הצדדים<br>של הרצועה</div>
+        <div class="h">עם גאיה וליאור · פרק חדש כל שבועיים</div>
+      </div>
+    </div>
+    <div class="reveal">
+      <span class="kicker">🎙️ הפודקאסט שלי</span>
+      <h2>הפודקאסט שמדבר בגובה הרצועה</h2>
+      <p class="desc">אני (המאמנת) וליאור (הבעלים) מפרקים פעם בשבועיים את מה שכולנו עושים עם הכלבים שלנו — מה עובד, מה פחות, ולמה.</p>
+      <div class="pod-stats">
+        <span class="pod-pill">⭐ <b>5.0</b> באפל פודקאסטס</span>
+        <span class="pod-pill"><b>23+</b> פרקים</span>
+        <span class="pod-pill">עדכון דו־שבועי</span>
+      </div>
+      <div class="ep-row">
+        <a class="ep" href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener"><span class="pl">▶</span> למה כלבים תוקפים?</a>
+        <a class="ep" href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener"><span class="pl">▶</span> גבולות</a>
+        <a class="ep" href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener"><span class="pl">▶</span> יציאה מאזור נוחות</a>
+      </div>
+      <a class="btn btn-sun" href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener">לכל הפרקים 🎧</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="kicker">בעלים מספרים 💬</span>
+      <h2>ההודעות שאני הכי אוהבת לקבל</h2>
+    </div>
+    <div class="chat-grid">
+      <article class="chat reveal">
+        <div class="chat-top"><span class="avatar">🐕</span><span>משפחת כהן + לוקה<small>ליווי בעיות התנהגות</small></span></div>
+        <div class="chat-body">
+          <div class="bubble me">גאיה!! את לא מאמינה. טיול שלם בלי משיכה אחת 😭</div>
+          <div class="bubble me">השכנים שאלו אם החלפנו כלב</div>
+          <div class="bubble">חחח ידעתי שתגיעו לשם 🙌 תמשיכו בדיוק ככה</div>
+        </div>
+      </article>
+      <article class="chat reveal">
+        <div class="chat-top"><span class="avatar">🐶</span><span>דנה + צ'יקו הגור<small>מסלול גורים</small></span></div>
+        <div class="chat-body">
+          <div class="bubble me">לילה שלישי ברצף שהוא ישן עד הבוקר 🎉</div>
+          <div class="bubble me">ובלי פיפי בסלון!!</div>
+          <div class="bubble">אלופים! עכשיו מתחילים לעבוד על "לבד בבית" 💪</div>
+        </div>
+      </article>
+      <article class="chat reveal">
+        <div class="chat-top"><span class="avatar">🦮</span><span>יובל ועדי + מקס<small>ליווי משפחתי</small></span></div>
+        <div class="chat-body">
+          <div class="bubble me">יצאנו לערב שלם ומקס נשאר רגוע. לפני חצי שנה זה היה מדע בדיוני</div>
+          <div class="bubble">וזה רק שלכם — אתם עשיתם את העבודה 🧡</div>
+          <div class="bubble me">לא היינו מגיעים לזה בלעדייך. תודה ענקית</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="container">
+    <div class="sec-head reveal" style="margin-inline:auto;text-align:center;max-width:100%">
+      <span class="kicker">שאלות נפוצות 🤔</span>
+      <h2>רגע, יש לי שאלה —</h2>
+    </div>
+    <div class="faq-wrap reveal">
+      <details>
+        <summary>באיזה גיל מתחילים אילוף?</summary>
+        <p>מהיום שהגור נכנס הביתה! בחודשים הראשונים נבנים ההרגלים והביטחון — וכל מה שמשקיעים בהם חוסך בעיות אחר כך. וגם כלב בוגר לומד מצוין. אף פעם לא מאוחר.</p>
+      </details>
+      <details>
+        <summary>הכלב שלי תוקפני — יש מה לעשות?</summary>
+        <p>כן, וברוב המקרים זה בכלל לא "תוקפנות" אלא פחד, הגנה על משאבים או תסכול. אחרי פגישת אבחון נבין מה מפעיל אותו ונבנה תוכנית הדרגתית ובטוחה — בקצב שלו ושלכם.</p>
+      </details>
+      <details>
+        <summary>איפה נפגשים?</summary>
+        <p>אצלכם בבית ובסביבה הקרובה — כי שם הבעיות קורות באמת, ושם הפתרונות צריכים לעבוד. בהמשך יוצאים יחד גם למקומות מאתגרים יותר.</p>
+      </details>
+      <details>
+        <summary>כמה זמן עד שרואים שינוי?</summary>
+        <p>שינויים ראשונים מרגישים לרוב כבר אחרי המפגשים הראשונים. שינוי עמוק ויציב נבנה לאורך תהליך — תלוי בכלב, בהיסטוריה שלו, ובכמה תתאמנו ביניכם.</p>
+      </details>
+      <details>
+        <summary>את עובדת עם ענישה?</summary>
+        <p>לא. אני עובדת עם חיזוקים, הבנה וגבולות ברורים — בלי הפחדה ובלי כאב. כלב שלומד מתוך ביטחון לומד באמת; כלב שלומד מתוך פחד רק מסתיר את הבעיה.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="final">
+  <span class="paws p1">🐾</span>
+  <span class="paws p2">🐾</span>
+  <div class="container reveal">
+    <h2>מוכנים לטיולים רגועים ולבית שקט?</h2>
+    <p>שיחת היכרות ראשונה עליי — ובינתיים, בואו לראות אימונים אמיתיים באינסטגרם.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-lg btn-sun" href="https://wa.me/9725XXXXXXXX?text=היי%20גאיה%2C%20אשמח%20לתאם%20שיחת%20היכרות" target="_blank" rel="noopener">לתיאום שיחת היכרות 💬</a>
+      <a class="btn btn-lg btn-light" href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener"><span dir="ltr">@gaya_dogtraining</span> ↗</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container footer-grid">
+    <span>© <span id="year"></span> גאיה דניאל · דרך הקאהו 🐾</span>
+    <span>
+      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener">אינסטגרם</a>
+      &nbsp;·&nbsp;
+      <a href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener">הפודקאסט</a>
+    </span>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/9725XXXXXXXX?text=היי%20גאיה%2C%20אשמח%20לשמוע%20על%20הליווי%20שלך" target="_blank" rel="noopener" aria-label="וואטסאפ">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.39-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5 0 1.47 1.07 2.89 1.22 3.09.15.2 2.11 3.22 5.1 4.51.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.84 9.84 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.9-9.88a9.83 9.83 0 0 1 7 2.9 9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.9 9.88m8.42-18.3A11.8 11.8 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.9c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.9 11.9 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.9 0-3.18-1.24-6.16-3.48-8.41"/></svg>
+</a>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const header = document.querySelector('header');
+  addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 10), {passive:true});
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => {
+    if (el.getBoundingClientRect().top < innerHeight * .95) el.classList.add('no-anim','in');
+    else io.observe(el);
+  });
+</script>
+</body>
+</html>
