@@ -222,6 +222,22 @@
   details[open] summary::after{transform:rotate(180deg)}
   details p{padding:0 var(--s3) var(--s3);color:var(--ink-60);max-width:65ch}
 
+  /* ============ COMMUNITY GRID ============ */
+  .com-grid{display:grid;gap:var(--s3);grid-template-columns:1fr;margin-bottom:var(--s4)}
+  @media(min-width:700px){.com-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.com-grid{grid-template-columns:repeat(3,1fr)}}
+  .com-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--r);
+    overflow:hidden;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;transition:transform .25s;
+  }
+  .com-card:hover{transform:translateY(-5px)}
+  .com-card .media{aspect-ratio:4/5;background:var(--beige)}
+  .com-card .media img,.com-card .media video{width:100%;height:100%;object-fit:cover}
+  .com-card .body{padding:1.2rem 1.4rem}
+  .com-card h3{font-size:1.1rem;font-weight:700;margin-bottom:.2rem}
+  .com-card p{font-size:.92rem;color:var(--ink-60)}
+
   /* ============ SOCIAL ============ */
   .social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   .social-grid a{position:relative;display:block;overflow:hidden;border-radius:var(--r-sm);aspect-ratio:1}
@@ -294,7 +310,7 @@
       <a href="#about">מי אני</a>
       <a href="#podcast">הפודקאסט</a>
       <a href="#services">איך עובדים</a>
-      <a href="community.html">הקהילה</a>
+      <a href="#community">הקהילה</a>
       <a class="btn" href="#contact">לתיאום שיחת היכרות</a>
     </nav>
   </div>
@@ -475,23 +491,15 @@
   </div>
 </section>
 
-<!-- ============ SOCIAL ============ -->
-<section id="social">
+<!-- ============ COMMUNITY ============ -->
+<section id="community">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="label-he">בסושיאל 📱</span>
-      <h2>אימונים אמיתיים, בלי פילטרים.</h2>
-      <p class="sub">טיפים, סרטונים מהשטח ורגעים מאחורי הקלעים — כל מה שקורה בין פגישה לפגישה.</p>
+      <span class="label-he">הקהילה של גאיה 🐾</span>
+      <h2>סרטונים, עבודות ורגעים מהשטח.</h2>
+      <p class="sub">כלבים ובעלים שעשו את הדרך — אימונים אמיתיים והתקדמות אמיתית. הסקשן מתעדכן כל הזמן, ויש עוד המון בסטוריז.</p>
     </div>
-    <!-- TODO: להחליף בתוכן אמיתי מהאינסטגרם של גאיה -->
-    <div class="social-grid reveal">
-      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener" aria-label="פוסט באינסטגרם"><img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=500&q=70" alt="כלב שמח בריצה" loading="lazy"></a>
-      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener" aria-label="פוסט באינסטגרם"><img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=70" alt="גור גולדן רטריבר" loading="lazy"></a>
-      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener" aria-label="פוסט באינסטגרם"><img src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=500&q=70" alt="גור במהלך אימון" loading="lazy"></a>
-      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener" aria-label="פוסט באינסטגרם"><img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=500&q=70" alt="שני כלבים יושבים יחד" loading="lazy"></a>
-      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener" aria-label="פוסט באינסטגרם"><img src="https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=500&q=70" alt="כלב עטוף בשמיכה" loading="lazy"></a>
-      <a href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener" aria-label="פוסט באינסטגרם"><img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=500&q=70" alt="גור ביגל" loading="lazy"></a>
-    </div>
+    <div class="com-grid reveal" id="community-grid"><!-- נטען מ-community.json --></div>
     <div class="social-cta reveal">
       <a class="btn btn-lg btn-ig" href="https://www.instagram.com/gaya_dogtraining" target="_blank" rel="noopener">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -507,19 +515,6 @@
         וואטסאפ
       </a>
     </div>
-  </div>
-</section>
-
-<!-- ============ COMMUNITY BANNER ============ -->
-<section style="padding-block:0">
-  <div class="container">
-    <a href="community.html" class="reveal" style="display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;background:var(--olive-dk);color:var(--cream);border-radius:var(--r);padding:clamp(1.8rem,4vw,3rem)">
-      <span>
-        <span style="display:block;font-size:var(--fs-h3);font-weight:800;letter-spacing:-.01em">הקהילה של גאיה 🐾</span>
-        <span style="color:hsla(40,36%,96%,.75)">סרטונים מאימונים, עבודות עם לקוחות ורגעים מהשטח — מתעדכן כל הזמן</span>
-      </span>
-      <span class="btn" style="background:var(--cream);color:var(--ink);border-color:var(--cream);flex:none">לכניסה לקהילה ←</span>
-    </a>
   </div>
 </section>
 
@@ -592,6 +587,40 @@
     if (el.getBoundingClientRect().top < innerHeight * .95) el.classList.add('no-anim','in');
     else io.observe(el);
   });
+
+  /* גלריית הקהילה — להוספת פריט מוסיפים שורה ל-community.json:
+     סרטון: {"type":"video","src":"videos/שם.mp4","title":"...","desc":"..."}
+     פוסט אינסטגרם: {"type":"instagram","url":"https://www.instagram.com/p/XXXX/","title":"..."}
+     תמונה: {"type":"image","src":"images/שם.jpg","title":"...","desc":"..."} */
+  fetch('community.json')
+    .then(r => r.json())
+    .then(items => {
+      const grid = document.getElementById('community-grid');
+      let hasInsta = false;
+      items.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'com-card';
+        let media = '';
+        if (item.type === 'video') {
+          media = `<video controls preload="metadata" playsinline ${item.poster ? `poster="${item.poster}"` : ''}><source src="${item.src}" type="video/mp4"></video>`;
+        } else if (item.type === 'instagram') {
+          hasInsta = true;
+          media = `<blockquote class="instagram-media" data-instgrm-permalink="${item.url.replace(/\/?$/, '/')}" data-instgrm-version="14" style="margin:0;width:100%"></blockquote>`;
+        } else {
+          media = `<img src="${item.src}" alt="${item.title || ''}" loading="lazy">`;
+        }
+        card.innerHTML = `<div class="media">${media}</div>` +
+          (item.title || item.desc ? `<div class="body">${item.title ? `<h3>${item.title}</h3>` : ''}${item.desc ? `<p>${item.desc}</p>` : ''}</div>` : '');
+        grid.appendChild(card);
+      });
+      if (hasInsta) {
+        const s = document.createElement('script');
+        s.src = 'https://www.instagram.com/embed.js';
+        s.async = true;
+        document.body.appendChild(s);
+      }
+    })
+    .catch(() => {});
 
   // טופס → הודעת וואטסאפ מוכנה
   document.getElementById('lead-form').addEventListener('submit', e => {
