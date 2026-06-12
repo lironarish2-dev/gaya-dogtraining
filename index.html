@@ -26,12 +26,12 @@
     --cream:   hsl(40, 36%, 96%);
     --beige:   hsl(38, 30%, 91%);
     --sand:    hsl(36, 28%, 87%);
-    --olive-t: hsl(82, 18%, 88%);   /* olive tint for cards */
+    --olive-t: hsl(30, 85%, 90%);   /* warm tint for cards */
     --ink:     hsl(40, 10%, 9%);
     --ink-60:  hsl(40, 6%, 35%);
     --ink-40:  hsl(40, 5%, 52%);
-    --olive:   hsl(82, 20%, 36%);
-    --olive-dk:hsl(82, 24%, 27%);
+    --olive:   hsl(25, 82%, 46%);   /* warm honey-orange (Dana-inspired) */
+    --olive-dk:hsl(22, 78%, 36%);
     --line:    hsl(38, 14%, 80%);
 
     --fs-body: clamp(1rem, .96rem + .2vw, 1.1rem);
@@ -82,8 +82,8 @@
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
     font-weight:600;font-size:.98rem;
-    background:var(--ink);color:var(--cream);
-    padding:.85rem 2rem;border-radius:99px;border:1.5px solid var(--ink);
+    background:var(--olive);color:#fff;
+    padding:.85rem 2rem;border-radius:99px;border:1.5px solid var(--olive);
     transition:background .25s,color .25s,transform .25s;cursor:pointer;
   }
   .btn:hover{background:var(--olive-dk);border-color:var(--olive-dk);transform:translateY(-2px)}
