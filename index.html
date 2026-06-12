@@ -244,6 +244,14 @@
     padding:.25rem .9rem;border-radius:99px;
   }
 
+  /* ============ STEPS ============ */
+  .steps{display:grid;gap:var(--s3);margin-top:var(--s8)}
+  @media(min-width:880px){.steps{grid-template-columns:repeat(3,1fr)}}
+  .step{background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4)}
+  .step .n{font-weight:800;font-size:1.7rem;color:var(--olive);display:block;letter-spacing:-.02em}
+  .step b{display:block;margin:.3rem 0 .2rem;font-size:1.05rem}
+  .step p{color:var(--ink-60);font-size:.95rem}
+
   /* ============ COMMUNITY GRID ============ */
   .com-grid{display:grid;gap:var(--s3);grid-template-columns:1fr;margin-bottom:var(--s4)}
   @media(min-width:700px){.com-grid{grid-template-columns:repeat(2,1fr)}}
