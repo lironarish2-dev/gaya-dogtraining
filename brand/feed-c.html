@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דוגמה ג׳ · אנרגיה — 4 תכנים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800;900&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kahu:#46679F; --kahu-deep:#3A5688; --kahu-light:#7B96C4; --sky:#AFC2E0;
+    --cream:#F4F0E8; --sand:#EAE3D6; --camel:#C49A6C; --ink:#1D2839; --ink-60:#5A6372;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Heebo',sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin-inline:auto;padding:3rem clamp(1.25rem,4vw,3rem)}
+  header{margin-bottom:2.5rem}
+  .kicker{font-size:.85rem;font-weight:600;letter-spacing:.14em;color:var(--kahu)}
+  h1{font-size:clamp(1.9rem,1.5rem+2vw,2.8rem);font-weight:900;line-height:1.15}
+  .lead{color:var(--ink-60);max-width:58ch;margin-top:.5rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.5rem}
+  .post{
+    aspect-ratio:1/1;border-radius:18px;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;
+    box-shadow:0 2px 6px rgba(29,40,57,.06), 0 16px 34px rgba(29,40,57,.12);
+  }
+  .pad{padding:1.6rem;display:flex;flex-direction:column;height:100%;position:relative;z-index:2}
+  .handle{position:absolute;bottom:.9rem;inset-inline-start:1.2rem;font-size:.7rem;font-weight:600;letter-spacing:.08em;z-index:4;direction:ltr;unicode-bidi:isolate}
+
+  /* מילה ענקית חתוכה — המוטיב מהרפרנס */
+  .bigword{
+    position:absolute;font-weight:900;line-height:.85;letter-spacing:-.02em;
+    z-index:1;user-select:none;pointer-events:none;white-space:nowrap;
+  }
+
+  /* 1 — שאלת HOOK (כמו agitado) */
+  .p-hook{background:linear-gradient(170deg,var(--kahu-light),var(--kahu) 70%)}
+  .p-hook .bigword{font-size:11rem;color:var(--kahu-deep);inset-inline-end:-2.4rem;top:-1.2rem;writing-mode:vertical-rl;opacity:.55}
+  .p-hook .social{display:flex;gap:.6rem;align-items:center;color:var(--cream);font-size:.72rem;font-weight:600;letter-spacing:.06em}
+  .p-hook .social svg{width:16px;height:16px;fill:var(--cream)}
+  .p-hook .small{color:var(--cream);font-size:1.05rem;font-weight:600;margin-top:1.4rem}
+  .p-hook h2{font-size:3.1rem;font-weight:900;line-height:.95;color:#fff;letter-spacing:-.01em}
+  .p-hook .ans{margin-top:.7rem;font-size:1rem;color:var(--cream);font-weight:400;max-width:24ch}
+  .p-hook .ans b{color:#fff}
+  .p-hook .photo{
+    position:absolute;bottom:-4%;inset-inline-end:-3%;width:62%;aspect-ratio:1;border-radius:50%;
+    background:url('../images/gaya-hero.jpg') center 20%/cover;
+    border:6px solid rgba(244,240,232,.35);z-index:2;
+  }
+  .p-hook .handle{color:rgba(244,240,232,.85)}
+
+  /* 2 — מסלולים (כמו כרטיסי החנות) */
+  .p-tracks{background:var(--cream)}
+  .p-tracks .blob{position:absolute;width:75%;aspect-ratio:1;border-radius:50%;background:var(--sand);inset-inline-end:-25%;top:-25%;z-index:1}
+  .p-tracks .label{font-size:.74rem;font-weight:600;letter-spacing:.16em;color:var(--camel)}
+  .p-tracks h2{font-size:1.7rem;font-weight:900;line-height:1.2;margin:.3rem 0 1rem}
+  .p-tracks h2 b{color:var(--kahu)}
+  .p-tracks ul{list-style:none;display:grid;gap:.55rem;font-weight:600;font-size:1.02rem}
+  .p-tracks li{display:flex;align-items:center;gap:.6rem}
+  .p-tracks li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--kahu);flex:none}
+  .p-tracks li:nth-child(2)::before{background:var(--camel)}
+  .p-tracks li:nth-child(3)::before{background:var(--kahu-light)}
+  .p-tracks li:nth-child(4)::before{background:var(--kahu-deep)}
+  .p-tracks .cta{
+    margin-top:auto;align-self:flex-start;background:var(--kahu);color:#fff;
+    font-weight:600;font-size:.95rem;padding:.7rem 1.6rem;border-radius:99px;
+  }
+  .p-tracks .handle{color:var(--ink-60)}
+
+  /* 3 — מניפסט KAHU (טקסט ענק על אינדיגו) */
+  .p-manifest{background:var(--kahu)}
+  .p-manifest .bigword{font-size:10rem;color:var(--kahu-deep);bottom:-2.2rem;inset-inline-start:-1.5rem;opacity:.6}
+  .p-manifest h2{font-size:1.85rem;font-weight:900;line-height:1.28;color:var(--cream);margin-top:1.2rem}
+  .p-manifest h2 em{font-style:normal;color:var(--camel)}
+  .p-manifest .kahu-en{letter-spacing:.02em}
+  .p-manifest .badge{width:40px;height:40px}
+  .p-manifest .handle{color:rgba(244,240,232,.8)}
+
+  /* 4 — פודקאסט (עטיפה + מילה חתוכה) */
+  .p-pod{background:var(--sand)}
+  .p-pod .bigword{font-size:9.5rem;color:var(--cream);top:-1.6rem;inset-inline-start:-1rem;opacity:.9}
+  .p-pod .pad{align-items:center;justify-content:center;text-align:center}
+  .p-pod .cover{width:50%;border-radius:14px;transform:rotate(4deg);box-shadow:0 14px 30px rgba(29,40,57,.28);margin-bottom:1rem}
+  .p-pod .label{font-size:.74rem;font-weight:600;letter-spacing:.16em;color:var(--kahu)}
+  .p-pod h2{font-size:1.45rem;font-weight:900;margin-top:.2rem}
+  .p-pod p{font-size:.92rem;color:var(--ink-60)}
+  .p-pod .handle{color:var(--ink-60)}
+
+  footer{margin-top:3rem;font-size:.85rem;color:var(--ink-60);border-top:1px solid #ddd5c6;padding-top:1.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="kicker">דוגמה ג׳ · אנרגיה</span>
+    <h1>גדול, חתוך וקופץ לעין</h1>
+    <p class="lead">בהשראת הרפרנסים ששלחת: מילה ענקית שנחתכת בקצה, שאלה שתופסת בגלילה, תמונות בתוך עיגולים וצבע אחד חזק — אבל בצבעים של קאהו, לא של אף אחד אחר. המילים — של גאיה.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- 1 שאלת HOOK -->
+    <div class="post p-hook">
+      <span class="bigword">מקערה?</span>
+      <div class="pad">
+        <div class="social">
+          <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 4 4 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zm0 3.6a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M19.6 6.3a4.8 4.8 0 0 1-3.4-1.4 4.8 4.8 0 0 1-1.4-3.4h-3.5v13.9a2.9 2.9 0 1 1-2.1-2.8V9a6.4 6.4 0 1 0 5.6 6.4V8.6a8.2 8.2 0 0 0 4.8 1.5z"/></svg>
+          <span dir="ltr">@gaya_dogtraining</span>
+        </div>
+        <p class="small">עדיין מאכילים</p>
+        <h2>מקערה?</h2>
+        <p class="ans">יש דרך שתיתן לכלב שלכם <b>עבודה לראש</b> — ותחזיר לכם שקט בבית.</p>
+      </div>
+      <span class="photo"></span>
+    </div>
+
+    <!-- 2 מסלולים -->
+    <div class="post p-tracks">
+      <span class="blob"></span>
+      <div class="pad">
+        <span class="label">הליווי של גאיה</span>
+        <h2>מה <b>באמת</b> משתנה בבית?</h2>
+        <ul>
+          <li>איזון מהשורש</li>
+          <li>כלים לחיים</li>
+          <li>שקט נפשי</li>
+          <li>מעטפת מלאה</li>
+        </ul>
+        <span class="cta">לשיחת היכרות ←</span>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+    <!-- 3 מניפסט -->
+    <div class="post p-manifest">
+      <span class="bigword">KAHU</span>
+      <div class="pad">
+        <img class="badge" src="logo-mark.svg" alt="">
+        <h2>הכלב שלכם לא צריך שתאלפו אותו —<br><em>הוא צריך שתהיו ה־<span class="kahu-en">KAHU</span> שלו!</em></h2>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+    <!-- 4 פודקאסט -->
+    <div class="post p-pod">
+      <span class="bigword">רצועה</span>
+      <div class="pad">
+        <img class="cover" src="../images/podcast-cover.jpg" alt="עטיפת הפודקאסט">
+        <span class="label">פרק חדש בפודקאסט</span>
+        <h2>משני הצדדים של הרצועה</h2>
+        <p>פרק חדש כל שבועיים · ★5.0 באפל פודקאסטס</p>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+  </div>
+
+  <footer>דרך הקאהו · דוגמה ג׳ — אנרגיה · בהשראת הרפרנסים, בצבעי המותג · הטקסטים מתוך התוכן של גאיה</footer>
+</div>
+</body>
+</html>

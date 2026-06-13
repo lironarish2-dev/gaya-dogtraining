@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דוגמה ב׳ · אינדיגו עמוק — 4 תכנים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800;900&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kahu:#46679F; --deep:#1B2A45; --night:#141F33; --cream:#F4F0E8;
+    --camel:#C49A6C; --cream-70:rgba(244,240,232,.72);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Heebo',sans-serif;background:var(--night);color:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin-inline:auto;padding:3rem clamp(1.25rem,4vw,3rem)}
+  header{margin-bottom:2.5rem}
+  .kicker{font-size:.85rem;font-weight:600;letter-spacing:.14em;color:var(--camel)}
+  h1{font-size:clamp(1.9rem,1.5rem+2vw,2.8rem);font-weight:900;line-height:1.15;color:var(--cream)}
+  .lead{color:var(--cream-70);max-width:55ch;margin-top:.5rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.5rem}
+  .post{
+    aspect-ratio:1/1;border-radius:8px;overflow:hidden;position:relative;
+    background:var(--deep);display:flex;flex-direction:column;
+    box-shadow:0 18px 44px rgba(0,0,0,.4);
+  }
+  .post .pad{padding:1.7rem;display:flex;flex-direction:column;height:100%;position:relative;z-index:2}
+  .handle{position:absolute;bottom:.9rem;inset-inline-start:1.2rem;font-size:.72rem;font-weight:600;letter-spacing:.1em;color:var(--cream-70);z-index:3;direction:ltr;unicode-bidi:isolate}
+
+  /* 1 — ציטוט: טיפוגרפיה ענקית, קו קאמל */
+  .p-quote{background:var(--deep)}
+  .p-quote .sig{font-family:'Amatic SC',cursive;font-weight:700;font-size:1.7rem;color:var(--camel);letter-spacing:.05em}
+  .p-quote h2{font-size:1.9rem;font-weight:900;line-height:1.22;margin-top:.8rem}
+  .p-quote h2 em{font-style:normal;color:var(--camel)}
+  .p-quote .rule{width:64px;height:4px;background:var(--camel);border-radius:2px;margin-top:auto}
+
+  /* 2 — זהות: תמונה מלאה בדואוטון */
+  .p-id img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;filter:grayscale(1) contrast(1.05);opacity:.55}
+  .p-id::before{content:"";position:absolute;inset:0;background:linear-gradient(15deg,var(--night) 8%,rgba(27,42,69,.45) 60%,rgba(27,42,69,.15));z-index:1}
+  .p-id .pad{justify-content:flex-end}
+  .p-id h2{font-size:1.45rem;font-weight:800;line-height:1.3}
+  .p-id p{font-size:.95rem;color:var(--cream-70)}
+
+  /* 3 — רילס: פס קאמל אנכי */
+  .p-reel{background:linear-gradient(120deg,var(--deep),var(--night))}
+  .p-reel .bar{position:absolute;inset-block:0;inset-inline-start:0;width:10px;background:var(--camel)}
+  .p-reel .pad{justify-content:center}
+  .p-reel .play{width:46px;height:46px;border-radius:50%;background:var(--camel);display:grid;place-items:center;margin-bottom:1.1rem}
+  .p-reel .play i{display:block;width:0;height:0;border-block:9px solid transparent;border-inline-start:14px solid var(--night);margin-inline-start:3px}
+  .p-reel h2{font-size:1.55rem;font-weight:900;line-height:1.3}
+  .p-reel h2 em{font-style:normal;color:var(--camel)}
+
+  /* 4 — פודקאסט: עטיפה נוטה + טקסט */
+  .p-pod .pad{justify-content:center;align-items:center;text-align:center}
+  .p-pod .cover{width:52%;border-radius:10px;transform:rotate(-4deg);box-shadow:0 16px 34px rgba(0,0,0,.5);margin-bottom:1.2rem}
+  .p-pod .label{font-size:.72rem;font-weight:600;letter-spacing:.18em;color:var(--camel)}
+  .p-pod h2{font-size:1.35rem;font-weight:900;margin-top:.2rem}
+  .p-pod p{font-size:.9rem;color:var(--cream-70)}
+
+  footer{margin-top:3rem;font-size:.85rem;color:var(--cream-70);border-top:1px solid rgba(244,240,232,.15);padding-top:1.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="kicker">דוגמה ב׳ · אינדיגו עמוק</span>
+    <h1>לילה, קאמל ועוצמה שקטה</h1>
+    <p class="lead">אותם 4 תכנים, אנרגיה אחרת: רקעים כחולים־עמוקים, תמונות בשחור־לבן, ונגיעות קאמל — החום של הכלב מהפוסטר. אותן מילים של גאיה.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- 1 ציטוט -->
+    <div class="post p-quote">
+      <div class="pad">
+        <span class="sig">גאיה דניאל</span>
+        <h2>אני לא הופכת את הכלב שלכם לבן אדם —<br><em>אני עוזרת לכם להבין איך העולם נראה מנקודת המבט שלו.</em></h2>
+        <span class="rule"></span>
+        <span class="handle">@gaya_dogtraining</span>
+      </div>
+    </div>
+
+    <!-- 2 זהות -->
+    <div class="post p-id">
+      <img src="../images/gaya-hero.jpg" alt="גאיה בשטח">
+      <div class="pad">
+        <h2>זאת שאומרת לא להאכיל מקערה 🐕</h2>
+        <p>לא מאלפת את הכלב — מגשרת בין העולמות. ובונה איתך אורח חיים שפותר בעיות ומחזיר נחת ושלווה.</p>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+    <!-- 3 רילס -->
+    <div class="post p-reel">
+      <span class="bar"></span>
+      <div class="pad">
+        <span class="play"><i></i></span>
+        <h2>כי מגיע לכלבים האלה<br><em>חיים טובים יותר</em> —<br>מאשר לחיות כל החיים בפחד.</h2>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+    <!-- 4 פודקאסט -->
+    <div class="post p-pod">
+      <div class="pad">
+        <img class="cover" src="../images/podcast-cover.jpg" alt="עטיפת הפודקאסט">
+        <span class="label">פרק חדש בפודקאסט</span>
+        <h2>משני הצדדים של הרצועה</h2>
+        <p>פרק חדש כל שבועיים · ★5.0 באפל פודקאסטס</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>דרך הקאהו · דוגמה ב׳ — אינדיגו עמוק · הטקסטים מתוך האינסטגרם והאתר של גאיה</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דרך הקאהו · השפה הגרפית — מדריך מותג</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800;900&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+
+<style>
+  /* ===== TOKENS — KAHU brand system ===== */
+  :root{
+    /* כחול קאהו — סולם גוונים (hue 217 קבוע) */
+    --kahu-50:  hsl(217, 35%, 96%);
+    --kahu-100: hsl(217, 36%, 91%);
+    --kahu-200: hsl(217, 36%, 84%);
+    --kahu-300: hsl(217, 37%, 72%);
+    --kahu-400: hsl(217, 37%, 60%);
+    --kahu-500: hsl(217, 39%, 45%);   /* הצבע הראשי — KAHU Blue */
+    --kahu-600: hsl(217, 41%, 38%);
+    --kahu-700: hsl(217, 43%, 30%);
+    --kahu-800: hsl(217, 44%, 21%);
+    --kahu-900: hsl(217, 45%, 13%);
+
+    /* נייטרלים חמים — מהפוסטר */
+    --cream:    hsl(40, 33%, 95%);    /* רקע דומיננטי (60%) */
+    --sand:     hsl(38, 28%, 89%);    /* משטחים משניים (30%) */
+    --camel:    hsl(30, 38%, 64%);    /* חום הכלב — חום אנושי, תמונות ופרטים */
+    --ink:      hsl(217, 25%, 14%);   /* טקסט — כהה נגוע כחול, לא שחור */
+    --ink-60:   hsl(217, 12%, 38%);
+    --line:     hsl(38, 18%, 80%);
+
+    /* טיפוגרפיה — Major Third (1.25) מבסיס 16px */
+    --fs-small: .875rem;
+    --fs-body:  1rem;
+    --fs-h4:    1.25rem;
+    --fs-h3:    1.563rem;
+    --fs-h2:    clamp(1.953rem, 1.6rem + 1.4vw, 2.441rem);
+    --fs-h1:    clamp(2.441rem, 1.9rem + 2.4vw, 3.052rem);
+
+    --s2:1rem; --s3:1.5rem; --s4:2rem; --s6:3rem; --s8:4rem;
+    --r:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Heebo',system-ui,sans-serif;
+    background:var(--cream); color:var(--ink);
+    font-size:var(--fs-body); line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin-inline:auto;padding:var(--s8) clamp(1.25rem,4vw,3rem)}
+  section{margin-bottom:var(--s8)}
+  h1{font-size:var(--fs-h1);font-weight:900;line-height:1.1;letter-spacing:-.01em}
+  h2{font-size:var(--fs-h2);font-weight:800;line-height:1.15;margin-bottom:var(--s3)}
+  h3{font-size:var(--fs-h3);font-weight:800;margin-bottom:var(--s2)}
+  p{max-width:65ch}
+  .lead{font-size:var(--fs-h4);color:var(--ink-60);max-width:55ch}
+  .kicker{
+    display:inline-block;font-size:var(--fs-small);font-weight:600;
+    letter-spacing:.14em;color:var(--kahu-500);margin-bottom:.5rem;
+  }
+
+  /* מוטיב הרצועה — מפריד מדורים */
+  .leash-divider{margin:var(--s8) 0;display:block}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:var(--s4)}
+  .grid{display:grid;gap:var(--s3)}
+  .grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+
+  /* לוגו */
+  .logo-stage{display:grid;place-items:center;padding:var(--s6);background:#fff;border:1px solid var(--line);border-radius:var(--r)}
+  .logo-stage.dark{background:var(--kahu-500)}
+  .logo-stage svg{width:min(340px,100%);height:auto}
+  .logo-stage .mark{width:110px}
+  .caption{font-size:var(--fs-small);color:var(--ink-60);margin-top:var(--s2);text-align:center}
+
+  /* צבעים */
+  .swatch{border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+  .swatch .chip{height:96px}
+  .swatch .meta{background:#fff;padding:.8rem 1rem;font-size:var(--fs-small)}
+  .swatch .meta b{display:block;font-size:1rem}
+  .scale{display:grid;grid-template-columns:repeat(9,1fr);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+  .scale div{height:64px;display:grid;place-items:end center;padding-bottom:.4rem;font-size:.7rem;font-weight:600}
+
+  /* טיפוגרפיה */
+  .type-row{display:flex;align-items:baseline;gap:var(--s3);padding:var(--s2) 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+  .type-row .spec{font-size:var(--fs-small);color:var(--ink-60);min-width:170px}
+  .sig{font-family:'Amatic SC',cursive;font-weight:700;color:var(--kahu-500)}
+
+  /* כפתורים */
+  .btn{
+    display:inline-flex;align-items:center;gap:.6rem;
+    background:var(--kahu-500);color:#fff;font-weight:600;
+    padding:.85rem 2rem;border-radius:99px;border:1.5px solid var(--kahu-500);
+    text-decoration:none;
+  }
+  .btn-outline{background:transparent;color:var(--ink);border-color:var(--ink)}
+
+  /* מוטיב צעדים */
+  .steps-dots{display:flex;gap:.55rem;align-items:center}
+  .steps-dots i{width:9px;height:9px;border-radius:50%;background:var(--kahu-300)}
+  .steps-dots i.on{background:var(--kahu-500)}
+
+  /* do / don't */
+  .dd{border-radius:var(--r);padding:var(--s3);border:1px solid var(--line);background:#fff}
+  .dd h4{font-size:var(--fs-body);font-weight:800;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+  .dd.do h4{color:hsl(150,45%,30%)}
+  .dd.dont h4{color:hsl(8,60%,42%)}
+  .dd ul{padding-inline-start:1.2rem;font-size:var(--fs-small);color:var(--ink-60);display:grid;gap:.35rem}
+
+  footer{border-top:1px solid var(--line);padding-top:var(--s4);font-size:var(--fs-small);color:var(--ink-60)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HERO ===== -->
+  <header style="margin-bottom:var(--s8)">
+    <span class="kicker">מדריך מותג · יוני 2026</span>
+    <h1>דרך הקאהו<br><span style="color:var(--kahu-500)">השפה הגרפית</span></h1>
+    <p class="lead" style="margin-top:var(--s3)">
+      קאהו (Kahu) בהוואית: שומר, מלווה, מי שמופקד על דבר יקר.
+      השפה הגרפית בנויה על אותו רעיון — שקט, ביטחון וחיבור.
+      רקע קרם חם, כחול אינדיגו יציב, ורצועה רפויה שעוברת כחוט מקשר בכל המותג.
+    </p>
+  </header>
+
+  <!-- ===== הלוגו ===== -->
+  <section>
+    <span class="kicker">01</span>
+    <h2>הלוגו</h2>
+    <p style="margin-bottom:var(--s3)">
+      אותיות KAHU בלוגו בנויות מקווים גיאומטריים בעובי אחיד — לא פונט קיים — ולכן הלוגו ייחודי לנו בלבד.
+      מתחתיו עוברת <b>הרצועה הרפויה</b>: קו משוחרר שנגמר בלולאת אחיזה.
+      רצועה רפויה היא הסימן המקצועי לכלב רגוע — מי שמגיע מהתחום מרגיש את זה מיד.
+      החתימה "גאיה דניאל" כתובה בכתב יד (Amatic SC).
+    </p>
+    <div class="grid grid-2">
+      <div>
+        <div class="logo-stage">
+          <img src="logo-primary.svg" alt="הלוגו הראשי" style="width:min(340px,100%)">
+        </div>
+        <p class="caption">הלוקאפ הראשי — לאתר, לפוסטרים ולכל שטח גדול</p>
+      </div>
+      <div>
+        <div class="logo-stage">
+          <img src="logo-mark.svg" alt="סמל KAHU" style="width:110px">
+        </div>
+        <p class="caption">הסמל — תמונת פרופיל, פאביקון, חותמת על תמונות</p>
+      </div>
+    </div>
+    <div style="margin-top:var(--s3)" class="grid grid-2">
+      <div>
+        <div class="logo-stage dark">
+          <img src="logo-primary-cream.svg" alt="גרסה הפוכה" style="width:min(300px,100%)">
+        </div>
+        <p class="caption">גרסה הפוכה — קרם על אינדיגו</p>
+      </div>
+      <div class="card">
+        <h3>כללי שימוש</h3>
+        <ul style="padding-inline-start:1.2rem;display:grid;gap:.5rem;font-size:var(--fs-small);color:var(--ink-60)">
+          <li><b>שטח נשימה:</b> סביב הלוגו שומרים מרווח בגובה האות K לפחות.</li>
+          <li><b>גודל מינימלי:</b> הלוקאפ המלא — 180px רוחב. מתחת לזה משתמשים בסמל.</li>
+          <li><b>צבעים מותרים:</b> אינדיגו על קרם/לבן, או קרם על אינדיגו. לעולם לא על תמונה עמוסה.</li>
+          <li><b>אסור:</b> למתוח, להטות, להוסיף צל, לשנות את עובי הקווים או להפריד את הרצועה מה־wordmark בלוקאפ הראשי.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- מפריד רצועה -->
+  <svg class="leash-divider" viewBox="0 0 1080 36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" height="36">
+    <path d="M0,12 C300,34 780,34 1064,14" stroke="var(--kahu-200)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="1070" cy="12" r="6" stroke="var(--kahu-200)" stroke-width="3" fill="none"/>
+  </svg>
+
+  <!-- ===== צבעים ===== -->
+  <section>
+    <span class="kicker">02</span>
+    <h2>צבע</h2>
+    <p style="margin-bottom:var(--s3)">
+      חלוקת 60–30–10: קרם הוא הבמה, חול וקאמל הם החום האנושי, והאינדיגו הוא הקול —
+      שמור לכותרות, לכפתורים ולרגעים שחשוב שיבלטו. בלי שחור טהור אף פעם.
+    </p>
+    <div class="grid grid-3" style="margin-bottom:var(--s3)">
+      <div class="swatch"><div class="chip" style="background:var(--kahu-500)"></div>
+        <div class="meta"><b>KAHU Blue · 500</b>hsl(217, 39%, 45%) — צבע המותג. כותרות ענק, CTA, הרצועה.</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--cream)"></div>
+        <div class="meta"><b>קרם · Cream</b>hsl(40, 33%, 95%) — הרקע הדומיננטי (60%).</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--sand)"></div>
+        <div class="meta"><b>חול · Sand</b>hsl(38, 28%, 89%) — כרטיסים ומשטחים משניים.</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--camel)"></div>
+        <div class="meta"><b>קאמל · Camel</b>hsl(30, 38%, 64%) — חום הכלב. פרטים, איורים, הדגשות חמות. לא לטקסט.</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--ink)"></div>
+        <div class="meta"><b>דיו · Ink</b>hsl(217, 25%, 14%) — טקסט רץ. כהה נגוע כחול, לא #000.</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--kahu-800)"></div>
+        <div class="meta"><b>אינדיגו עמוק · 800</b>hsl(217, 44%, 21%) — פוטר, מצבי לחיצה, טקסט על חול.</div></div>
+    </div>
+    <h3>סולם הכחול</h3>
+    <div class="scale">
+      <div style="background:var(--kahu-50);color:var(--kahu-700)">50</div>
+      <div style="background:var(--kahu-100);color:var(--kahu-700)">100</div>
+      <div style="background:var(--kahu-200);color:var(--kahu-800)">200</div>
+      <div style="background:var(--kahu-300);color:var(--kahu-900)">300</div>
+      <div style="background:var(--kahu-400);color:#fff">400</div>
+      <div style="background:var(--kahu-500);color:#fff">500</div>
+      <div style="background:var(--kahu-600);color:#fff">600</div>
+      <div style="background:var(--kahu-700);color:#fff">700</div>
+      <div style="background:var(--kahu-800);color:#fff">800</div>
+    </div>
+    <p class="caption" style="text-align:right">טקסט על קרם: 600 ומעלה בלבד (AA). רקעים עדינים: 50–200.</p>
+  </section>
+
+  <!-- ===== טיפוגרפיה ===== -->
+  <section>
+    <span class="kicker">03</span>
+    <h2>טיפוגרפיה</h2>
+    <p style="margin-bottom:var(--s3)">
+      שתי משפחות בלבד. <b>Heebo</b> עושה את הכול — מכותרות ענק במשקל 900 ועד טקסט רץ —
+      ו<b>Amatic SC</b> (כתב יד) שמורה לחתימה של גאיה ולמשפט אישי אחד בעמוד, לא יותר.
+      הסולם: Major Third (×1.25) מבסיס 16px.
+    </p>
+    <div class="card">
+      <div class="type-row"><span class="spec">Display · Heebo 900 · 49px+</span><span style="font-size:var(--fs-h1);font-weight:900;line-height:1.1">הכלב שלכם לא צריך תיקון</span></div>
+      <div class="type-row"><span class="spec">H2 · Heebo 800 · 39px</span><span style="font-size:var(--fs-h2);font-weight:800">הוא צריך שתבינו אותו</span></div>
+      <div class="type-row"><span class="spec">H3 · Heebo 800 · 25px</span><span style="font-size:var(--fs-h3);font-weight:800">ליווי אישי לבעלים ולכלב</span></div>
+      <div class="type-row"><span class="spec">Body · Heebo 400 · 16px</span><span style="max-width:48ch">אילוף שמתחיל בחיבור ולא בפקודות. עובדים על תקשורת, ביטחון והרגלים — בקצב של הכלב שלכם.</span></div>
+      <div class="type-row"><span class="spec">Label · Heebo 600 · 14px</span><span style="font-size:var(--fs-small);font-weight:600;letter-spacing:.14em;color:var(--ink-60)">הפודקאסט · משני הצדדים של הרצועה</span></div>
+      <div class="type-row" style="border-bottom:none"><span class="spec">חתימה · Amatic SC · 28px+</span><span class="sig" style="font-size:2.2rem">גאיה דניאל</span></div>
+    </div>
+  </section>
+
+  <!-- מפריד רצועה -->
+  <svg class="leash-divider" viewBox="0 0 1080 36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" height="36">
+    <path d="M0,12 C300,34 780,34 1064,14" stroke="var(--kahu-200)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="1070" cy="12" r="6" stroke="var(--kahu-200)" stroke-width="3" fill="none"/>
+  </svg>
+
+  <!-- ===== מוטיבים ===== -->
+  <section>
+    <span class="kicker">04</span>
+    <h2>מוטיבים חוזרים</h2>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>הרצועה הרפויה</h3>
+        <p style="font-size:var(--fs-small);color:var(--ink-60)">קו עדין שצונח ועולה, נגמר בלולאה. משמש כמפריד בין מדורים, קו מתחת לכותרות וקישוט בתחתית עמוד. תמיד רפוי — לעולם לא מתוח.</p>
+        <svg viewBox="0 0 220 30" style="margin-top:1rem"><path d="M4,10 C60,26 150,26 200,12" stroke="var(--kahu-400)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="207" cy="10" r="5" stroke="var(--kahu-400)" stroke-width="3" fill="none"/></svg>
+      </div>
+      <div class="card">
+        <h3>צעדים</h3>
+        <p style="font-size:var(--fs-small);color:var(--ink-60)">שורת נקודות (מהפוסטר — המחזירים על הטייץ). מסמנת תהליך והתקדמות: שלבי ליווי, פרקי פודקאסט, גלריה.</p>
+        <div class="steps-dots" style="margin-top:1.2rem"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="card">
+        <h3>תמונות גזורות</h3>
+        <p style="font-size:var(--fs-small);color:var(--ink-60)">דמויות גזורות מהרקע, מונחות על קרם נקי עם צל עדין — בלי רקעים עמוסים. הכלב והאדם תמיד יחד באותה תמונה, אף פעם לא כלב לבד שנראה "בעייתי".</p>
+        <div style="margin-top:1rem;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--sand),var(--cream));display:grid;place-items:center;color:var(--camel);font-weight:800">🐕 + 🧍‍♀️</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== רכיבים ===== -->
+  <section>
+    <span class="kicker">05</span>
+    <h2>רכיבים</h2>
+    <div class="card" style="display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center">
+      <a class="btn" href="#">לשיחת היכרות חינם</a>
+      <a class="btn btn-outline" href="#">לפודקאסט</a>
+      <span class="steps-dots"><i class="on"></i><i class="on"></i><i></i><i></i></span>
+    </div>
+    <p class="caption" style="text-align:right">כפתור ראשי: אינדיגו 500, פינות עגולות מלאות. משני: מתאר דיו. לעולם לא שני כפתורים מלאים זה לצד זה.</p>
+  </section>
+
+  <!-- ===== עשה / אל תעשה ===== -->
+  <section>
+    <span class="kicker">06</span>
+    <h2>עשה ואל תעשה</h2>
+    <div class="grid grid-2">
+      <div class="dd do">
+        <h4>✓ עשה</h4>
+        <ul>
+          <li>הרבה אוויר — לפחות 40% מהעמוד נושם</li>
+          <li>כותרת אחת דומיננטית בכל מסך</li>
+          <li>אינדיגו במשורה — כשהוא מופיע, הוא חשוב</li>
+          <li>טון כתיבה: בגובה העיניים, חם, בלי ז'רגון</li>
+          <li>הרצועה הרפויה כחוט מקשר בין מדורים</li>
+        </ul>
+      </div>
+      <div class="dd dont">
+        <h4>✗ אל תעשה</h4>
+        <ul>
+          <li>שחור טהור (#000) או לבן בוהק כרקע</li>
+          <li>יותר משתי משפחות פונט</li>
+          <li>צללים כבדים, גרדיאנטים צעקניים, אימוג'י בכותרות</li>
+          <li>תמונות סטוק של כלבים "אשמים" או רצועות מתוחות</li>
+          <li>כתום הדבש הישן — הוא שייך לשפה הקודמת</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    דרך הקאהו · גאיה דניאל — מדריך מותג גרסה 1.0 · יוני 2026
+    <br>קבצים: logo-primary.svg · logo-primary-cream.svg · logo-mark.svg · feed-a.html · feed-b.html · feed-c.html · brand-guide.html
+  </footer>
+</div>
+</body>
+</html>

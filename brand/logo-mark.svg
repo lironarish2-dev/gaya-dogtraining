@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="סמל KAHU">
+  <circle cx="60" cy="60" r="58" fill="#46679F"/>
+  <g stroke="#F4F0E8" stroke-width="14" fill="none">
+    <path d="M44,26 V82"/>
+    <path d="M48,57 L78,26"/>
+    <path d="M54,51 L80,82"/>
+  </g>
+  <g stroke-width="3.5" stroke="#F4F0E8" fill="none" stroke-linecap="round">
+    <circle cx="30" cy="94" r="2.5" fill="#F4F0E8" stroke="none"/>
+    <path d="M34,95 C48,102 70,102 83,96"/>
+    <circle cx="88" cy="93" r="5"/>
+  </g>
+</svg>

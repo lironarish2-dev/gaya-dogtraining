@@ -183,18 +183,26 @@
   .service-card .meta{font-size:var(--fs-small);font-weight:600;color:var(--olive-dk)}
   @media(min-width:880px){.service-grid{grid-template-columns:repeat(3,1fr)}}
 
-  /* ============ PODCAST BAND ============ */
-  .podcast{background:var(--ink);color:var(--cream)}
-  .pod-grid{display:grid;gap:var(--s6);align-items:center}
-  .pod-cover{width:min(100%,380px);justify-self:center;border-radius:var(--r);box-shadow:0 24px 60px hsla(40,10%,0%,.5)}
-  .podcast .label-he{color:hsla(40,36%,96%,.5)}
+  /* ============ PODCAST BAND — 50/50 brand + player ============ */
+  .podcast{background:var(--ink);color:var(--cream);padding:0!important;overflow:hidden}
+  .pod-grid{display:grid;gap:0;align-items:stretch;min-height:560px}
+  /* brand column — the KAHU logo/poster */
+  .pod-brand{
+    position:relative;display:flex;flex-direction:column;justify-content:flex-end;
+    padding:clamp(2rem,4vw,3.5rem);color:#fff;overflow:hidden;
+  }
+  .pod-brand img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+  /* player column */
+  .pod-player{padding:clamp(2rem,4vw,3.5rem);display:flex;flex-direction:column;justify-content:center}
+  .podcast .label-he{color:hsla(28,80%,68%,.9)}
   .podcast h2{font-size:var(--fs-h2);font-weight:800;letter-spacing:-.015em;margin:.3rem 0 var(--s2);color:#fff}
-  .podcast p{color:hsla(40,36%,96%,.68);max-width:50ch;margin-bottom:var(--s3)}
-  .pod-meta{display:flex;gap:var(--s3);margin-bottom:var(--s4);font-size:var(--fs-small);color:hsla(40,36%,96%,.55);flex-wrap:wrap}
+  .podcast p{color:hsla(40,36%,96%,.68);max-width:48ch;margin-bottom:var(--s3)}
+  .pod-meta{display:flex;gap:var(--s3);margin:var(--s3) 0;font-size:var(--fs-small);color:hsla(40,36%,96%,.55);flex-wrap:wrap}
   .pod-meta b{color:var(--cream);font-weight:600}
-  .podcast .btn{background:var(--cream);color:var(--ink);border-color:var(--cream)}
-  .podcast .btn:hover{background:#fff;transform:translateY(-2px)}
-  @media(min-width:880px){.pod-grid{grid-template-columns:.45fr .55fr;gap:clamp(3rem,6vw,5rem)}}
+  .podcast .btn{background:var(--olive);color:#fff;border-color:var(--olive);margin-top:var(--s2);align-self:flex-start}
+  .podcast .btn:hover{background:#fff;color:var(--ink);border-color:#fff;transform:translateY(-2px)}
+  @media(min-width:880px){.pod-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:879px){.pod-brand{min-height:340px}}
 
   /* ============ CHAT TESTIMONIALS ============ */
   .chat-grid{display:grid;gap:var(--s3);align-items:start}
@@ -405,18 +413,21 @@
   </div>
 </section>
 
-<!-- ============ PODCAST ============ -->
+<!-- ============ PODCAST — 50/50 brand + player ============ -->
 <section class="podcast" id="podcast">
-  <div class="container pod-grid">
-    <div class="reveal">
-      <iframe class="pod-embed" title="נגן הפודקאסט משני הצדדים של הרצועה" allow="autoplay *; encrypted-media *; clipboard-write" frameborder="0" height="450" style="width:100%;overflow:hidden;border-radius:18px;background:transparent" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation" src="https://embed.podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he&theme=dark" loading="lazy"></iframe>
+  <div class="pod-grid">
+    <!-- עמודה 1: דרך הקאהו · הלוגו -->
+    <div class="pod-brand reveal">
+      <img src="images/kahu-poster.jpg" alt="גאיה דניאל — דרך הקאהו, אילוף כלבים">
     </div>
-    <div class="reveal">
+    <!-- עמודה 2: נגן הפודקאסט -->
+    <div class="pod-player reveal">
       <span class="label-he">🎙️ הפודקאסט שלי</span>
       <h2>משני הצדדים של הרצועה</h2>
-      <p>אני (המאמנת) וליאור (הבעלים) יושבים פעם בשבועיים ומדברים בכנות על החיים עם כלב — מה עובד, מה נכשל, ולמה. בלי פילטרים, בלי שיפוטיות.</p>
+      <p>אני (המאמנת) וליאור (הבעלים) יושבים פעם בשבועיים ומדברים בכנות על החיים עם כלב — מה עובד, מה נכשל, ולמה.</p>
+      <iframe class="pod-embed" title="נגן הפודקאסט משני הצדדים של הרצועה" allow="autoplay *; encrypted-media *; clipboard-write" frameborder="0" height="175" style="width:100%;overflow:hidden;border-radius:14px;background:transparent" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation" src="https://embed.podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he&theme=dark" loading="lazy"></iframe>
       <div class="pod-meta"><span>★ <b>5.0</b> באפל פודקאסטס</span><span><b>23+</b> פרקים</span><span>פרק חדש כל שבועיים</span></div>
-      <a class="btn btn-lg" href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener">להאזנה לפודקאסט 🎧</a>
+      <a class="btn btn-lg" href="https://podcasts.apple.com/il/podcast/%D7%9E%D7%A9%D7%A0%D7%99-%D7%94%D7%A6%D7%93%D7%93%D7%99%D7%9D-%D7%A9%D7%9C-%D7%94%D7%A8%D7%A6%D7%95%D7%A2%D7%94/id1833786690?l=he" target="_blank" rel="noopener">להאזנה לכל הפרקים 🎧</a>
     </div>
   </div>
 </section>

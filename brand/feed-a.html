@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דוגמה א׳ · קלאסי קאהו — 4 תכנים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800;900&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kahu:#46679F; --kahu-dk:#2E4569; --cream:#F4F0E8; --sand:#EAE3D6;
+    --camel:#C49A6C; --ink:#1D2839; --ink-60:#5A6372;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Heebo',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin-inline:auto;padding:3rem clamp(1.25rem,4vw,3rem)}
+  header{margin-bottom:2.5rem}
+  .kicker{font-size:.85rem;font-weight:600;letter-spacing:.14em;color:var(--kahu)}
+  h1{font-size:clamp(1.9rem,1.5rem+2vw,2.8rem);font-weight:900;line-height:1.15}
+  .lead{color:var(--ink-60);max-width:55ch;margin-top:.5rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.5rem}
+  .post{
+    aspect-ratio:1/1;border-radius:20px;overflow:hidden;position:relative;
+    background:#fff;border:1px solid #ddd5c6;
+    display:flex;flex-direction:column;
+    box-shadow:0 2px 6px rgba(29,40,57,.05), 0 14px 30px rgba(29,40,57,.07);
+  }
+  .post .pad{padding:1.6rem;display:flex;flex-direction:column;height:100%}
+  .badge{
+    position:absolute;top:1rem;inset-inline-start:1rem;width:38px;height:38px;z-index:3;
+  }
+  .handle{position:absolute;bottom:.9rem;inset-inline-start:1.2rem;font-size:.72rem;font-weight:600;letter-spacing:.1em;color:var(--ink-60);z-index:3;direction:ltr;unicode-bidi:isolate}
+  .leash{margin-top:auto}
+
+  /* 1 — ציטוט מניפסט */
+  .p-quote{background:var(--cream)}
+  .p-quote h2{font-size:1.75rem;font-weight:900;line-height:1.25;color:var(--ink);margin-top:2.2rem}
+  .p-quote h2 b{color:var(--kahu)}
+  .p-quote .kahu-en{font-weight:900;letter-spacing:.02em}
+
+  /* 2 — זהות, תמונה גזורה */
+  .p-id{background:linear-gradient(160deg,var(--sand),var(--cream))}
+  .p-id img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;filter:saturate(.92)}
+  .p-id::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(244,240,232,.96) 18%,rgba(244,240,232,0) 55%)}
+  .p-id .pad{position:relative;z-index:2;justify-content:flex-end}
+  .p-id h2{font-size:1.35rem;font-weight:800;line-height:1.3}
+  .p-id p{font-size:.95rem;color:var(--ink-60)}
+
+  /* 3 — קאבר לרילס */
+  .p-reel{background:var(--kahu)}
+  .p-reel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4;filter:grayscale(.35) brightness(.45)}
+  .p-reel h2{text-shadow:0 1px 14px rgba(20,31,51,.45)}
+  .p-reel .pad{position:relative;z-index:2;color:var(--cream);justify-content:center}
+  .p-reel .play{width:46px;height:46px;border-radius:50%;border:2.5px solid var(--cream);display:grid;place-items:center;margin-bottom:1.1rem}
+  .p-reel .play i{display:block;width:0;height:0;border-block:9px solid transparent;border-inline-start:14px solid var(--cream);margin-inline-start:3px}
+  .p-reel h2{font-size:1.5rem;font-weight:900;line-height:1.3}
+  .p-reel .handle{color:rgba(244,240,232,.75)}
+
+  /* 4 — פודקאסט */
+  .p-pod{background:var(--cream)}
+  .p-pod .cover{width:54%;border-radius:14px;box-shadow:0 10px 26px rgba(29,40,57,.22);margin-bottom:1.1rem}
+  .p-pod .pad{align-items:center;text-align:center;justify-content:center}
+  .p-pod .label{font-size:.72rem;font-weight:600;letter-spacing:.16em;color:var(--kahu)}
+  .p-pod h2{font-size:1.3rem;font-weight:900;margin-top:.2rem}
+  .p-pod p{font-size:.9rem;color:var(--ink-60)}
+
+  .caption{font-size:.85rem;color:var(--ink-60);margin-top:.6rem;text-align:center}
+  footer{margin-top:3rem;font-size:.85rem;color:var(--ink-60);border-top:1px solid #ddd5c6;padding-top:1.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="kicker">דוגמה א׳ · קלאסי קאהו</span>
+    <h1>קרם, אינדיגו ושקט</h1>
+    <p class="lead">כמו הפוסטר: רקע קרם, האינדיגו מדבר, הרבה אוויר. כל הטקסטים — מהמילים של גאיה עצמה.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- 1 ציטוט -->
+    <div class="post p-quote">
+      <div class="pad">
+        <img class="badge" src="logo-mark.svg" alt="">
+        <h2>הכלב שלכם<br>לא צריך שתאלפו אותו —<br><b>הוא צריך שתהיו<br>ה־<span class="kahu-en">KAHU</span> שלו!</b></h2>
+        <svg class="leash" viewBox="0 0 260 26" fill="none"><path d="M6,8 C70,22 180,22 236,10" stroke="#46679F" stroke-width="3" stroke-linecap="round"/><circle cx="244" cy="8" r="5" stroke="#46679F" stroke-width="3"/><circle cx="4" cy="7" r="2.5" fill="#46679F"/></svg>
+        <span class="handle">@gaya_dogtraining</span>
+      </div>
+    </div>
+
+    <!-- 2 זהות -->
+    <div class="post p-id">
+      <img src="../images/gaya-hero.jpg" alt="גאיה בשטח">
+      <div class="pad">
+        <h2>זאת שאומרת לא להאכיל מקערה 🐕</h2>
+        <p>לא מאלפת את הכלב — מגשרת בין העולמות. ובונה איתך אורח חיים שפותר בעיות ומחזיר נחת ושלווה.</p>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+    <!-- 3 רילס -->
+    <div class="post p-reel">
+      <img src="../images/kahu-poster.jpg" alt="">
+      <div class="pad">
+        <span class="play"><i></i></span>
+        <h2>כי מגיע לכלבים האלה חיים טובים יותר —<br>מאשר לחיות כל החיים בפחד.</h2>
+      </div>
+      <span class="handle">@gaya_dogtraining</span>
+    </div>
+
+    <!-- 4 פודקאסט -->
+    <div class="post p-pod">
+      <div class="pad">
+        <img class="cover" src="../images/podcast-cover.jpg" alt="עטיפת הפודקאסט">
+        <span class="label">פרק חדש בפודקאסט</span>
+        <h2>משני הצדדים של הרצועה</h2>
+        <p>פרק חדש כל שבועיים · ★5.0 באפל פודקאסטס</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>דרך הקאהו · דוגמה א׳ — קלאסי קאהו · הטקסטים מתוך האינסטגרם והאתר של גאיה</footer>
+</div>
+</body>
+</html>
