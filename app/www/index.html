@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>KAHU — הקהילה של דרך הקאהו</title>
+<meta name="description" content="KAHU — רשת חברתית סגורה למאלפי כלבים ולבעלים: שיתוף התקדמות, השראה מהקהילה, וליווי מקצועי של המאלף במקום אחד.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ======== מסך פתיחה ======== -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="splash-mark">🐾</div>
+  <div class="splash-name">KAHU</div>
+  <div class="splash-sub">חיבור · איזון · שפה משותפת</div>
+</div>
+
+<!-- ======== אונבורדינג ======== -->
+<div id="onboarding" class="screen onboarding" hidden>
+  <!-- שלב 1: ברוכים הבאים -->
+  <section class="ob-step" data-step="1">
+    <div class="ob-hero">
+      <img src="images/gaya-hero.jpg" alt="" class="ob-hero-img">
+      <div class="ob-hero-fade"></div>
+    </div>
+    <div class="ob-body">
+      <h1 class="ob-title">ברוכים הבאים<br>ל‑KAHU</h1>
+      <p class="ob-text">הקהילה הסגורה של דרך הקאהו — המקום שבו בעלים, כלבים ומאלפים מתקדמים ביחד. משתפים רגעים, מקבלים השראה, ורואים את הדרך.</p>
+      <button class="btn btn-primary btn-block" data-next>בואו נתחיל</button>
+    </div>
+  </section>
+
+  <!-- שלב 2: מי אתם -->
+  <section class="ob-step" data-step="2" hidden>
+    <div class="ob-body ob-pad-top">
+      <p class="ob-label">שלב 1 מתוך 3</p>
+      <h2 class="ob-title-sm">מי אתם בקהילה?</h2>
+      <p class="ob-text">בוחרים תפקיד — אפשר לשנות בהגדרות בכל שלב.</p>
+      <div class="role-cards">
+        <button class="role-card" data-role="owner" aria-pressed="false">
+          <span class="role-emoji">🦮</span>
+          <span class="role-name">בעל/ת כלב</span>
+          <span class="role-desc">אני כאן כדי להתקדם עם הכלב שלי, לשתף ולקבל ליווי</span>
+        </button>
+        <button class="role-card" data-role="trainer" aria-pressed="false">
+          <span class="role-emoji">🎓</span>
+          <span class="role-name">מאלף/ת</span>
+          <span class="role-desc">אני מלווה לקוחות, בונה קהילה ועוקב/ת אחרי התקדמות</span>
+        </button>
+      </div>
+      <button class="btn btn-primary btn-block" data-next disabled id="ob-role-next">המשך</button>
+    </div>
+  </section>
+
+  <!-- שלב 3: קוד הזמנה -->
+  <section class="ob-step" data-step="3" hidden>
+    <div class="ob-body ob-pad-top">
+      <p class="ob-label">שלב 2 מתוך 3</p>
+      <h2 class="ob-title-sm">קוד הזמנה</h2>
+      <p class="ob-text">KAHU היא קהילה סגורה. מצטרפים רק עם קוד אישי מהמאלף/ת — כך שומרים על מרחב בטוח ומוכר.</p>
+      <input id="ob-code" class="input input-code" type="text" inputmode="text" autocomplete="one-time-code" placeholder="לדוגמה: GAYA2026" aria-label="קוד הזמנה" maxlength="12">
+      <p class="ob-hint" id="ob-code-hint">לדמו: הקוד <b>GAYA2026</b> פתוח</p>
+      <button class="btn btn-primary btn-block" data-next id="ob-code-next">הצטרפות לקהילה</button>
+    </div>
+  </section>
+
+  <!-- שלב 4: פרופיל -->
+  <section class="ob-step" data-step="4" hidden>
+    <div class="ob-body ob-pad-top">
+      <p class="ob-label">שלב 3 מתוך 3</p>
+      <h2 class="ob-title-sm">הפרופיל שלכם</h2>
+      <p class="ob-text">מה שתכתבו כאן — זה בדיוק מה שכל חבר קהילה יראה בפרופיל שלכם.</p>
+      <label class="field"><span>השם שלך</span><input id="ob-name" class="input" type="text" placeholder="לדוגמה: ליהיא כהן"></label>
+      <label class="field"><span>שם הכלב</span><input id="ob-dog" class="input" type="text" placeholder="לדוגמה: לונה"></label>
+      <label class="field"><span>גזע (לא חובה)</span><input id="ob-breed" class="input" type="text" placeholder="לדוגמה: בורדר קולי"></label>
+      <button class="btn btn-primary btn-block" id="ob-finish">סיימנו — אל הקהילה 🎉</button>
+    </div>
+  </section>
+</div>
+
+<!-- ======== האפליקציה ======== -->
+<div id="app" hidden>
+
+  <!-- כותרת עליונה -->
+  <header class="topbar">
+    <button class="topbar-btn" id="btn-settings" aria-label="הגדרות">⚙️</button>
+    <div class="topbar-logo">KAHU <span class="paw">🐾</span></div>
+    <button class="topbar-btn" id="btn-notifs" aria-label="התראות">
+      🔔<span class="badge-dot" id="notif-dot" hidden></span>
+    </button>
+  </header>
+
+  <!-- מסכים -->
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <!-- ניווט תחתון -->
+  <nav class="tabbar" aria-label="ניווט ראשי">
+    <button class="tab" data-tab="feed" aria-label="בית"><span class="tab-ico">🏠</span><span class="tab-txt">בית</span></button>
+    <button class="tab" data-tab="community" aria-label="קהילה"><span class="tab-ico">👥</span><span class="tab-txt">קהילה</span></button>
+    <button class="tab tab-add" data-tab="compose" aria-label="שיתוף חדש"><span class="tab-add-circle">+</span></button>
+    <button class="tab" data-tab="journey" id="tab-role" aria-label="המסלול"><span class="tab-ico">🧭</span><span class="tab-txt">המסלול</span></button>
+    <button class="tab" data-tab="profile" aria-label="הפרופיל שלי"><span class="tab-ico">🐶</span><span class="tab-txt">פרופיל</span></button>
+  </nav>
+</div>
+
+<!-- גיליון תחתון (bottom sheet) -->
+<div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+<div id="sheet" class="sheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet-handle"></div>
+  <div id="sheet-content" class="sheet-content"></div>
+</div>
+
+<!-- טוסט -->
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
