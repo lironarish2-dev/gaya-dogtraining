@@ -170,7 +170,7 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 61</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 62</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -4351,9 +4351,13 @@ function renderDiagLine(){
       return `${c.name}: ${w&&h ? w+'×'+h : 'רזולוציה לא ידועה'} · ` +
              `${(c.file.size/1073741824).toFixed(2)}GB · ` +
              `קריאה ${c._readMbs>0 ? c._readMbs.toFixed(0)+'MB/s' : 'לא נמדדה'}` +
+             ` · היסט ${(c.offset>=0?'+':'')}${c.offset.toFixed(2)}ש׳` +
              (sync ? ' · '+sync : '') +
              ((w>=3000||h>=1600) ? ' ⚠️' : '');
     });
+    /* גם המיקרופונים — היסט ידני שנשאר בהם מזיז את כל הסנכרון בקובץ */
+    for(const m of S.clips.filter(c=>c.kind==='audio'))
+      rows.push(`${m.name}: היסט ${(m.offset>=0?'+':'')}${m.offset.toFixed(2)}ש׳`);
     const noRate = cams.some(c=>c._syncWin===1);
     const fourK = cams.some(c=>(c.el.videoWidth||0)>=3000 || (c.el.videoHeight||0)>=1600);
     const slowRead = cams.some(c=>c._readMbs>0 && c._readMbs<25);
