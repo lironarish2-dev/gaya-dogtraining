@@ -178,7 +178,7 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 59</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 60</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -2351,6 +2351,11 @@ function seek(t){
     try{ c.el.currentTime = clamp(fileTimeOf(c, player.t), 0, (c.dur||1)-0.05); }catch(e){}
     c.el.playbackRate = c.rate||1;
   }
+  for(const c of S.clips) if(c.kind === 'video') c._pvPts = undefined;
+  /* אחרי קפיצה: עד שהמצלמה שעל המסך באמת מציגה פריים מהמקום החדש,
+     הקול ממתין לה. עדיף רגע של שקט מסאונד שרץ מעל תמונה ישנה —
+     זה בדיוק "הקול יוצא מסנכרון" אחרי קפיצה לאמצע. */
+  player._seekSettle = player.playing ? performance.now() : undefined;
   updateStage(); drawAll(); updateTime(); paintStage();
 }
 /* ניגון עם קבצי מצלמה של ג'יגה: seek הוא פעולה יקרה שתוקעת את התמונה
@@ -2378,6 +2383,7 @@ function syncOthers(){
         try{ c.el.currentTime = clamp(target,0,(c.dur||1)-0.05); }catch(e){}
         c.el.playbackRate = base;
       }
+      else if(Math.abs(d) > 0.15) c.el.playbackRate = base*(d>0 ? 0.9 : 1.1);
       else if(Math.abs(d) > 0.05) c.el.playbackRate = base*(d>0 ? 0.95 : 1.05);
       else c.el.playbackRate = base;
     } else {
@@ -2408,6 +2414,17 @@ function preRoll(){
     }
   }
 }
+/* הזמן של הפריים שמוצג באמת על המסך. currentTime של הנגן רץ לפני
+   התמונה כשהמחשב מתאמץ לפענח — ומי שנצמד אליו (הקול) מקדים את מה
+   שרואים. rVFC מדווח בדיוק איזה פריים הוצג. */
+function armPtsTracker(c){
+  if(c.kind !== 'video' || c._pvArmed) return;
+  if(typeof c.el.requestVideoFrameCallback !== 'function') return;
+  c._pvArmed = true;
+  const track = (nw, md)=>{ c._pvPts = md.mediaTime;
+    c.el.requestVideoFrameCallback(track); };
+  c.el.requestVideoFrameCallback(track);
+}
 async function play(){
   await ensureAudio(); applyGains();
   player.clock = pickClock(); if(!player.clock) return;
@@ -2421,6 +2438,7 @@ async function play(){
     if(c._stream){ pcmStreamer(c); setGain(c, 0); continue; }   // האלמנט שקט; הקול מהזרם
     try{ c.el.currentTime = clamp(fileTimeOf(c, player.t), 0, (c.dur||1)-0.05); }catch(e){}
     c.el.playbackRate = (c.rate||1)/(player.clock.rate||1);
+    if(c.kind === 'video'){ c._pvPts = undefined; armPtsTracker(c); }
     c.el.play().catch(()=>{});      // הכול מתנגן; המעבר בין דוברות הוא תצוגה בלבד
   }
   applyGains();
@@ -2439,7 +2457,11 @@ function stopAll(){
 function loop(){
   if(!player.playing) return;
   const ck = player.clock;
-  const rawCt = ck.el.currentTime, now = performance.now();
+  /* שעון הפרויקט = הפריים שמוצג באמת (rVFC). בסוף הקובץ, כשאין יותר
+     פריימים, חוזרים למונה כדי שסיום הפרק יזוהה. */
+  const rawCt = (ck.kind === 'video' && !ck.el.ended && ck._pvPts !== undefined)
+    ? ck._pvPts : ck.el.currentTime;
+  const now = performance.now();
   /* שומר קפיצות: ספארי מאבד לפעמים seek רחוק בקובץ של ג'יגה וחוזר בשקט
      לתחילת הקובץ. וידאו לא יכול לזוז 3 שניות בפריים אחד — אז קפיצה כזאת
      היא שקר של הדפדפן, לא זמן אמיתי: עוצרים את האודיו, מחזירים את
@@ -2471,12 +2493,28 @@ function loop(){
       const limit = starving ? 400 : 1500;
       if(now - player._ckAt > limit && !player._held) holdAudio();
     } else {
-      if(player._held && !player._glitch) releaseAudio(projTimeOf(ck, rawCt));
+      if(player._held && !player._glitch && player._seekSettle === undefined)
+        releaseAudio(projTimeOf(ck, rawCt));
       player._ckCt = rawCt; player._ckAt = now;
     }
   }
   player.t = projTimeOf(ck, rawCt);
   player._expect = player.t;
+  if(player._seekSettle !== undefined){
+    const whoS = whoAt(player.t), camsS = whoS === 2 ? [0,1] : [whoS];
+    let ready = true;
+    for(const w of camsS){
+      const c = S.people[w] && clip(S.people[w].camId);
+      if(!c || c.broken || c.el.paused) continue;
+      if(typeof c.el.requestVideoFrameCallback !== 'function') continue;
+      if(c._pvPts === undefined ||
+         Math.abs(fileTimeOf(c, player.t) - c._pvPts) > 0.25) ready = false;
+    }
+    if(ready || now - player._seekSettle > 4000){
+      player._seekSettle = undefined;
+      if(player._held && !player._glitch && !player._stallHold) releaseAudio(player.t);
+    } else if(!player._held) holdAudio();
+  }
   if(player.t >= (S.outPoint ?? S.t1) - 0.02){ stopAll(); seek(S.inPoint ?? S.t0); return; }
   syncOthers(); updateStage(); handoverClock(); preRoll(); stallCheck(); updateTime();
   if(!rendering) paintStage();          // בזמן יצירה הציור קורה בקנבס היצירה בלבד
