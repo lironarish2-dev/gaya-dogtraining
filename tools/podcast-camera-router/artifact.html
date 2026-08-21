@@ -170,7 +170,7 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 60</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 61</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -3871,11 +3871,30 @@ async function fastRender(){
       };
       const readers = new Map();
       const readerOf = c => { let r = readers.get(c); if(!r){ r = mkReader(c); readers.set(c, r); } return r; };
+      /* קצב הקובץ = קצב המצלמה. מצלמת 30fps שנדגמת ב-25 שומטת פריים
+         כל חמישית שנייה — בדיוק ה"תקיעות" שנראות בקובץ. לכן הטיקים
+         רצים בקצב המקורי של המצלמות (הגבוה מביניהן, עד 30). */
+      let TFPS = FPS;
+      for(const c of camsAll){
+        const idx = c._idx, m = Math.min(idx.n - 1, 250);
+        if(m > 10){
+          const deltas = [];
+          for(let i=1;i<=m;i++) deltas.push(idx.dts[i] - idx.dts[i-1]);
+          deltas.sort((x,y)=>x-y);
+          const med = deltas[deltas.length>>1];
+          if(med > 0){
+            const f = Math.round(1/med);
+            if(f >= 23 && f <= 60) TFPS = Math.max(TFPS, Math.min(30, f));
+          }
+        }
+      }
+      engineUsed = `פענוח ישיר · ${TFPS}fps`;
+      const keyEveryT = TFPS * 3;
       try{
-        const nTicks = Math.max(1, Math.round((b - a) * FPS));
+        const nTicks = Math.max(1, Math.round((b - a) * TFPS));
         for(let k = 0; k < nTicks; k++){
           if(stopReq) break;
-          const t = a + k / FPS;
+          const t = a + k / TFPS;
           const who = whoAt(t);
           ctx.fillStyle = '#141312'; ctx.fillRect(0, 0, W, H);
           if(who === 2){
@@ -3896,14 +3915,14 @@ async function fastRender(){
           }
           drawNameTag(ctx, W, H, who);
           if(burnCaps) drawCaption(ctx, W, H, t);
-          const vf = new VideoFrame(cv, { timestamp: Math.round(k / FPS * 1e6) });
-          venc.encode(vf, { keyFrame: frames % keyEvery === 0 });
+          const vf = new VideoFrame(cv, { timestamp: Math.round(k / TFPS * 1e6) });
+          venc.encode(vf, { keyFrame: frames % keyEveryT === 0 });
           vf.close(); frames++;
           while((venc.encodeQueueSize || 0) > 20 && !encError) await new Promise(r=>setTimeout(r, 3));
           if(encError) throw encError;
           if(frames % 250 === 0) flushParts(false);
           if(frames % 25 === 0){
-            const el = (performance.now() - t0wall) / 1000, doneSec = k / FPS;
+            const el = (performance.now() - t0wall) / 1000, doneSec = k / TFPS;
             const speed = doneSec / Math.max(el, 0.1);
             $('#renderProg').value = clamp(doneSec / (b - a), 0, 1);
             st(`יוצרת ${Math.round(doneSec / (b - a) * 100)}% · פי ${speed.toFixed(1)} ממהירות רגילה · נותרו ~${fmtDur(Math.max(0, ((b - a) - doneSec) / Math.max(speed, 0.1)))}`);
@@ -4070,13 +4089,14 @@ async function fastRender(){
       offerDownload(blob, `TEST-podcast-${$('#aspect').value.replace(':','x')}.${ext}`,
         `<b>זו בדיקה של ${fmtDur(b-a)} בלבד, לא הפרק.</b> הורידי ופתחי אותה: ` +
         `אם היא נפתחת, נשמעת ומתחלפת בין הדוברות כמו שצריך — הפרק המלא יעבוד בדיוק אותו דבר.` +
-        `<br>חלקוּת: ${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה · מנוע: ${engineUsed}.${smoothNote}`);
+        `<br>חלקוּת: ${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה · מנוע: ${engineUsed}.${smoothNote}` +
+        renderDiagLine());
       return;
     }
     offerDownload(blob, `podcast-${$('#aspect').value.replace(':','x')}.${ext}`,
       `${fmtDur(b-a)} נוצרו ב-${fmtDur(secs)} — פי ${((b-a)/secs).toFixed(1)} מהזמן האמיתי · ` +
       `${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה · מנוע: ${engineUsed}.` +
-      smoothNote);
+      smoothNote + renderDiagLine());
     st(`הסתיים · ${fmtSize(blob.size)} · פי ${((b-a)/secs).toFixed(1)}`);
   }catch(e){
     markFastBroken();
