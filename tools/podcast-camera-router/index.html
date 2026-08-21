@@ -178,7 +178,7 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 58</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 59</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -3386,6 +3386,186 @@ async function pickCodecs(W, H){
   if((v8||v9) && op) return { container:'webm', v:(v8||v9), a:op };
   return null;
 }
+/* mp4Index — מפענח מבנה (demuxer) ל-MP4: קורא את טבלאות ה-moov ומחזיר
+   לכל דגימת וידאו את המיקום, הגודל, החותמות והאם היא פריים-מפתח.
+   עובד על Blob/File (גם בדפדפן וגם ב-Node), קורא רק את הכותרות —
+   לא את המדיה עצמה, ולכן מהיר גם על קובץ של 2GB.
+   תומך ב-avc1/avc3 (H.264, כולל B-frames דרך ctts) וב-vp09. */
+async function mp4Index(file){
+  const str4 = (dv,p)=>String.fromCharCode(dv.getUint8(p),dv.getUint8(p+1),dv.getUint8(p+2),dv.getUint8(p+3));
+  const read = async (off,len)=>new DataView(await file.slice(off, off+len).arrayBuffer());
+
+  /* סריקת הקופסאות העליונות עד שמוצאים moov — לפעמים הוא בסוף הקובץ */
+  let pos = 0, moov = null;
+  while(pos + 8 <= file.size){
+    const h = await read(pos, Math.min(16, file.size - pos));
+    let size = h.getUint32(0), hdr = 8;
+    const type = str4(h, 4);
+    if(size === 1){ size = Number(h.getBigUint64(8)); hdr = 16; }
+    else if(size === 0) size = file.size - pos;
+    if(size < hdr) throw new Error('mp4: קופסה שבורה ב-'+pos);
+    if(type === 'moov'){ moov = { dv: await read(pos, size), hdr }; break; }
+    pos += size;
+  }
+  if(!moov) throw new Error('mp4: אין moov');
+  const dv = moov.dv;
+
+  function* boxes(lo, hi){
+    let p = lo;
+    while(p + 8 <= hi){
+      let size = dv.getUint32(p), hdr = 8;
+      const type = str4(dv, p+4);
+      if(size === 1){ size = Number(dv.getBigUint64(p+8)); hdr = 16; }
+      else if(size === 0) size = hi - p;
+      if(size < hdr || p + size > hi) break;
+      yield { type, lo: p+hdr, hi: p+size };
+      p += size;
+    }
+  }
+  const find = (lo,hi,t)=>{ for(const b of boxes(lo,hi)) if(b.type===t) return b; return null; };
+
+  /* בחירת ה-trak של הווידאו */
+  let best = null;
+  for(const trak of boxes(moov.hdr, dv.byteLength)){
+    if(trak.type !== 'trak') continue;
+    const mdia = find(trak.lo, trak.hi, 'mdia'); if(!mdia) continue;
+    const hdlr = find(mdia.lo, mdia.hi, 'hdlr'); if(!hdlr) continue;
+    if(str4(dv, hdlr.lo + 8) !== 'vide') continue;
+    best = { trak, mdia }; break;
+  }
+  if(!best) throw new Error('mp4: אין רצועת וידאו');
+
+  const mdhd = find(best.mdia.lo, best.mdia.hi, 'mdhd');
+  const mdhdV = dv.getUint8(mdhd.lo);
+  const timescale = mdhdV === 1 ? dv.getUint32(mdhd.lo + 20) : dv.getUint32(mdhd.lo + 12);
+  const mediaDur = mdhdV === 1 ? Number(dv.getBigUint64(mdhd.lo + 24)) : dv.getUint32(mdhd.lo + 16);
+
+  /* elst: הזחת עריכה — קובצי מצלמה/אייפון לעיתים פותחים בהיסט קטן */
+  let editShift = 0;
+  const edts = find(best.trak.lo, best.trak.hi, 'edts');
+  if(edts){
+    const elst = find(edts.lo, edts.hi, 'elst');
+    if(elst){
+      const v = dv.getUint8(elst.lo), n = dv.getUint32(elst.lo + 4);
+      let p = elst.lo + 8;
+      for(let i=0;i<n;i++){
+        const mt = v===1 ? Number(dv.getBigInt64(p+8)) : dv.getInt32(p+4);
+        if(mt >= 0){ editShift = mt / timescale; break; }   // -1 = רשומת השהיה, ממשיכים
+        p += v===1 ? 20 : 12;
+      }
+    }
+  }
+
+  const minf = find(best.mdia.lo, best.mdia.hi, 'minf');
+  const stbl = find(minf.lo, minf.hi, 'stbl');
+
+  /* stsd — סוג הקידוד, מידות, ותיאור המפענח */
+  const stsd = find(stbl.lo, stbl.hi, 'stsd');
+  let codec = null, description = null, width = 0, height = 0;
+  for(const e of boxes(stsd.lo + 8, stsd.hi)){
+    const fmt = e.type;
+    if(!/^(avc1|avc3|vp09|hev1|hvc1)$/.test(fmt)) continue;
+    width  = dv.getUint16(e.lo + 24); height = dv.getUint16(e.lo + 26);
+    const kids = e.lo + 78;                       // VisualSampleEntry: 78 בייטים של שדות
+    if(fmt === 'avc1' || fmt === 'avc3'){
+      const avcC = find(kids, e.hi, 'avcC');
+      if(!avcC) throw new Error('mp4: avc1 בלי avcC');
+      description = new Uint8Array(dv.buffer, dv.byteOffset + avcC.lo, avcC.hi - avcC.lo).slice();
+      codec = 'avc1.' + [1,2,3].map(i=>description[i].toString(16).padStart(2,'0')).join('');
+    } else if(fmt === 'vp09'){
+      const vpcC = find(kids, e.hi, 'vpcC');
+      if(vpcC){
+        const prof = dv.getUint8(vpcC.lo + 4), lvl = dv.getUint8(vpcC.lo + 5);
+        const bd = dv.getUint8(vpcC.lo + 6) >> 4;
+        codec = `vp09.${String(prof).padStart(2,'0')}.${String(lvl).padStart(2,'0')}.${String(bd).padStart(2,'0')}`;
+      } else codec = 'vp09.00.10.08';
+    } else throw new Error('mp4: קידוד לא נתמך בכלי הזה: ' + fmt);
+    break;
+  }
+  if(!codec) throw new Error('mp4: לא זוהה קידוד וידאו נתמך');
+
+  const fullbox = b => ({ n: dv.getUint32(b.lo + 4), p: b.lo + 8, v: dv.getUint8(b.lo) });
+
+  /* stts → משכי דגימות → dts מצטבר */
+  const stts = fullbox(find(stbl.lo, stbl.hi, 'stts'));
+  let total = 0;
+  { let p = stts.p; for(let i=0;i<stts.n;i++){ total += dv.getUint32(p); p += 8; } }
+  /* MP4 מפורק (fragmented) מחזיק את הדגימות ב-moof, לא כאן — שייפול
+     חזרה ללכידת מסך במקום לייצר קובץ ריק */
+  if(!total) throw new Error('mp4: אין טבלת דגימות (קובץ מפורק?)');
+  const dts = new Float64Array(total), pts = new Float64Array(total);
+  { let p = stts.p, s = 0, t = 0;
+    for(let i=0;i<stts.n;i++){
+      const cnt = dv.getUint32(p), del = dv.getUint32(p+4); p += 8;
+      for(let j=0;j<cnt;j++){ dts[s++] = t; t += del; }
+    } }
+
+  /* ctts → היסט הצגה (B-frames). בגרסה 1 ההיסט חתום.
+     ברירת מחדל pts=dts, וההיסטים משוכתבים עליה */
+  pts.set(dts);
+  const cttsB = find(stbl.lo, stbl.hi, 'ctts');
+  if(cttsB){
+    const c = fullbox(cttsB);
+    let p = c.p, s = 0;
+    for(let i=0;i<c.n && s<total;i++){
+      const cnt = dv.getUint32(p);
+      const off = c.v === 1 ? dv.getInt32(p+4) : dv.getUint32(p+4);
+      p += 8;
+      for(let j=0;j<cnt && s<total;j++){ pts[s] = dts[s] + off; s++; }
+    }
+  }
+
+  /* stss → פריימים-מפתח (בהיעדרו — כולם) */
+  const key = new Uint8Array(total);
+  const stssB = find(stbl.lo, stbl.hi, 'stss');
+  if(stssB){
+    const s = fullbox(stssB);
+    let p = s.p;
+    for(let i=0;i<s.n;i++){ const idx = dv.getUint32(p) - 1; if(idx>=0 && idx<total) key[idx] = 1; p += 4; }
+  } else key.fill(1);
+
+  /* stsz → גדלים */
+  const stszB = find(stbl.lo, stbl.hi, 'stsz');
+  const uniform = dv.getUint32(stszB.lo + 4);
+  const size = new Uint32Array(total);
+  if(uniform) size.fill(uniform);
+  else { let p = stszB.lo + 12; for(let i=0;i<total;i++){ size[i] = dv.getUint32(p); p += 4; } }
+
+  /* stsc + stco/co64 → מיקום כל דגימה בקובץ */
+  const stscB = fullbox(find(stbl.lo, stbl.hi, 'stsc'));
+  let stcoB = find(stbl.lo, stbl.hi, 'stco'), co64 = false;
+  if(!stcoB){ stcoB = find(stbl.lo, stbl.hi, 'co64'); co64 = true; }
+  const chunks = fullbox(stcoB);
+  const off = new Float64Array(total);
+  { let s = 0, entry = 0;
+    for(let ch = 0; ch < chunks.n && s < total; ch++){
+      /* כמה דגימות בצ'אנק הזה לפי טבלת ה-stsc */
+      while(entry + 1 < stscB.n && dv.getUint32(stscB.p + (entry+1)*12) - 1 <= ch) entry++;
+      const perChunk = dv.getUint32(stscB.p + entry*12 + 4);
+      let base = co64 ? Number(dv.getBigUint64(chunks.p + ch*8)) : dv.getUint32(chunks.p + ch*4);
+      for(let j=0;j<perChunk && s<total;j++){ off[s] = base; base += size[s]; s++; }
+    } }
+
+  /* שניות + הזחת עריכה; ומיפוי פריימים-מפתח לחיפוש מהיר */
+  const ptsSec = new Float64Array(total), dtsSec = new Float64Array(total);
+  for(let i=0;i<total;i++){ ptsSec[i] = pts[i]/timescale - editShift; dtsSec[i] = dts[i]/timescale; }
+  const keyList = [];
+  for(let i=0;i<total;i++) if(key[i]) keyList.push(i);
+  if(!keyList.length) keyList.push(0);
+
+  return { codec, description, timescale, width, height, n: total,
+           off, size, pts: ptsSec, dts: dtsSec, key, keyList,
+           dur: mediaDur/timescale - editShift,
+           /* אינדקס הדגימה (בסדר הקובץ) של הפריים-מפתח האחרון שזמן
+              ההצגה שלו ≤ ft — נקודת ההתחלה לפענוח */
+           keyBefore(ft){
+             let lo = 0, hi = keyList.length - 1, ans = keyList[0];
+             while(lo <= hi){ const m = (lo+hi)>>1, i = keyList[m];
+               if(ptsSec[i] <= ft + 1e-6){ ans = i; lo = m+1; } else hi = m-1; }
+             return ans;
+           } };
+}
+
 async function fastRenderSupported(){
   if(!window.VideoEncoder || !window.AudioEncoder || !window.VideoFrame) return false;
   return !!(await pickCodecs(1280, 720));
@@ -3581,6 +3761,129 @@ async function fastRender(){
        שנייה של תוכן מקבלת כפול פריימים אמיתיים — לוקח יותר זמן,
        והקובץ יוצא חלק. */
     if(camsAll.some(c => c.file && c.file.size > 800*1048576)) SPEED = 1;
+    let maxLagSeen = 0, skippedDesync = 0, engineUsed = 'לכידת מסך';
+    /* בחירת מנוע. הדרך הישנה לכדה את מה שהדפדפן הספיק להציג על המסך —
+       ולכן החותמות נגררו אחרי התוכן במחשב עמוס ("הפה זז אחרי הסאונד"),
+       והמהירות הוגבלה לקצב המסך. כשהמצלמות הן MP4 שנפתח במפענח,
+       קוראים את הפריימים ישירות מהקובץ: כל פריים מקבל את החותמת
+       האמיתית שלו (סנכרון מבנייה), והמהירות נקבעת רק מכוח המחשב. */
+    let engine = 'playback';
+    if(typeof VideoDecoder === 'function'){
+      try{
+        for(const c of camsAll){
+          if(!c._idx) c._idx = await mp4Index(c.file);
+          const sup = await VideoDecoder.isConfigSupported({ codec: c._idx.codec,
+            description: c._idx.description || undefined });
+          if(!sup || !sup.supported) throw new Error('אין תמיכת פענוח ל-' + c._idx.codec);
+        }
+        engine = 'decode';
+      }catch(e){ engine = 'playback'; }
+    }
+
+    const engineDecode = async ()=>{
+      /* קורא-מפענח לכל מצלמה: מקבל זמן-קובץ ומחזיר את הפריים ששייך
+         בדיוק לאותו רגע. שומר רצף פענוח חם — איפוס רק בקפיצה אמיתית. */
+      const mkReader = (cam)=>{
+        const idx = cam._idx;
+        let out = [], cur = null, di = -1, flushed = false, err = null, dec = null;
+        const mk = ()=>{
+          dec = new VideoDecoder({ output: f=>out.push(f), error: e=>{ err = err || e; } });
+          dec.configure({ codec: idx.codec, description: idx.description || undefined });
+        };
+        mk();
+        const feed = async (cnt)=>{
+          const end = Math.min(idx.n, di + cnt);
+          /* קריאה אחת רציפה מהדיסק במקום עשרות קטנות, כשאפשר */
+          let lo = idx.off[di], hi = 0, mono = true, prev = -1;
+          for(let i=di;i<end;i++){ if(idx.off[i] < prev) mono = false;
+            prev = idx.off[i]; lo = Math.min(lo, idx.off[i]); hi = Math.max(hi, idx.off[i]+idx.size[i]); }
+          let buf = null, base = 0;
+          if(mono && hi - lo <= 24*1048576){ buf = await cam.file.slice(lo, hi).arrayBuffer(); base = lo; }
+          for(let i=di;i<end;i++){
+            const data = buf ? new Uint8Array(buf, idx.off[i]-base, idx.size[i])
+              : new Uint8Array(await cam.file.slice(idx.off[i], idx.off[i]+idx.size[i]).arrayBuffer());
+            dec.decode(new EncodedVideoChunk({ type: idx.key[i] ? 'key' : 'delta',
+              timestamp: Math.round(idx.pts[i]*1e6), data }));
+          }
+          di = end;
+          while(dec.decodeQueueSize > 30 && !err) await new Promise(r=>setTimeout(r, 2));
+        };
+        return {
+          async frameAt(ft){
+            const target = clamp(ft, 0, Math.max(0, idx.dur - 0.001));
+            const curT = cur ? cur.timestamp/1e6 : -1;
+            if(di < 0 || (cur && (target < curT - 0.05 || target - curT > 6))){
+              for(const f of out) f.close(); out = [];
+              if(cur){ cur.close(); cur = null; }
+              try{ dec.reset(); }catch(e){}
+              if(dec.state === 'closed') mk();
+              else dec.configure({ codec: idx.codec, description: idx.description || undefined });
+              di = idx.keyBefore(target); flushed = false;
+            }
+            const tw = performance.now();
+            while(true){
+              if(err) throw err;
+              while(out.length && out[0].timestamp/1e6 <= target + 2e-3){
+                if(cur) cur.close(); cur = out.shift(); }
+              if(out.length) return cur || out[0];
+              if(di < idx.n) await feed(24);
+              else if(!flushed){ flushed = true; try{ await dec.flush(); }catch(e){} }
+              else return cur;
+              if(performance.now() - tw > 30000)
+                throw new Error('הפענוח נתקע — הקובץ כנראה פגום באזור ' + fmtDur(target));
+              await new Promise(r=>setTimeout(r, 0));
+            }
+          },
+          close(){ for(const f of out) f.close(); out = [];
+            if(cur){ cur.close(); cur = null; }
+            try{ dec.close(); }catch(e){} }
+        };
+      };
+      const readers = new Map();
+      const readerOf = c => { let r = readers.get(c); if(!r){ r = mkReader(c); readers.set(c, r); } return r; };
+      try{
+        const nTicks = Math.max(1, Math.round((b - a) * FPS));
+        for(let k = 0; k < nTicks; k++){
+          if(stopReq) break;
+          const t = a + k / FPS;
+          const who = whoAt(t);
+          ctx.fillStyle = '#141312'; ctx.fillRect(0, 0, W, H);
+          if(who === 2){
+            const live = camsAll.filter(c=>camCovers(c, t));
+            if(live.length === 2){
+              const f1 = await readerOf(live[0]).frameAt(fileTimeOf(live[0], t));
+              const f2 = await readerOf(live[1]).frameAt(fileTimeOf(live[1], t));
+              if(f1) drawCover(ctx, f1, 0, 0, W/2, H);
+              if(f2) drawCover(ctx, f2, W/2, 0, W/2, H);
+            } else if(live.length){
+              const f = await readerOf(live[0]).frameAt(fileTimeOf(live[0], t));
+              if(f) drawCover(ctx, f, 0, 0, W, H);
+            }
+          } else {
+            const cam = camForWho(who, t);
+            if(cam){ const f = await readerOf(cam).frameAt(fileTimeOf(cam, t));
+              if(f) drawCover(ctx, f, 0, 0, W, H); }
+          }
+          drawNameTag(ctx, W, H, who);
+          if(burnCaps) drawCaption(ctx, W, H, t);
+          const vf = new VideoFrame(cv, { timestamp: Math.round(k / FPS * 1e6) });
+          venc.encode(vf, { keyFrame: frames % keyEvery === 0 });
+          vf.close(); frames++;
+          while((venc.encodeQueueSize || 0) > 20 && !encError) await new Promise(r=>setTimeout(r, 3));
+          if(encError) throw encError;
+          if(frames % 250 === 0) flushParts(false);
+          if(frames % 25 === 0){
+            const el = (performance.now() - t0wall) / 1000, doneSec = k / FPS;
+            const speed = doneSec / Math.max(el, 0.1);
+            $('#renderProg').value = clamp(doneSec / (b - a), 0, 1);
+            st(`יוצרת ${Math.round(doneSec / (b - a) * 100)}% · פי ${speed.toFixed(1)} ממהירות רגילה · נותרו ~${fmtDur(Math.max(0, ((b - a) - doneSec) / Math.max(speed, 0.1)))}`);
+            await new Promise(r=>setTimeout(r, 0));   // לתת לממשק לנשום
+          }
+        }
+      } finally { for(const r of readers.values()) r.close(); }
+    };
+
+    const enginePlayback = async ()=>{
     for(const c of camsAll){
       c.el.muted = true;
       await seekFrame(c.el, clamp(fileTimeOf(c, a), 0, (c.dur||1)-0.05));
@@ -3592,15 +3895,28 @@ async function fastRender(){
        לא מסונכרן עם תקיעות. עכשיו מודדים את הפיגור כל רבע שנייה:
        מפגרת — כל הניגון מאט עד שהיא מדביקה; צמודה — מאיצים בהדרגה
        חזרה. המהירות בפועל היא מה שהמחשב באמת מסוגל לו. */
-    let curSpeed = SPEED, maxLagSeen = 0, skippedDesync = 0;
+    let curSpeed = SPEED;
     await new Promise(resolve=>{
       let stopped = false, lastNudge = 0;
       const finish = ()=>{ if(stopped) return; stopped = true;
         for(const c of camsAll){ try{ c.el.pause(); }catch(e){} c.el.playbackRate = 1; }
         resolve(); };
+      /* לכל מצלמה נרשם הזמן של הפריים שבאמת מוצג (mediaTime), לא שעון
+         הנגן (currentTime) שרץ לפני התמונה כשהפענוח מתאמץ. ההפרש
+         ביניהם הוא בדיוק "הפה זז אחרי הסאונד" — חותמת לפי השעון בזמן
+         שהתוכן מפגר. */
+      for(const c of camsAll){
+        c._pts = -1;
+        if(typeof c.el.requestVideoFrameCallback === 'function'){
+          const track = (nw, md)=>{ c._pts = md.mediaTime;
+            if(!stopped) c.el.requestVideoFrameCallback(track); };
+          c.el.requestVideoFrameCallback(track);
+        }
+      }
       const onFrame = ()=>{
         if(stopped) return;
-        const t = projTimeOf(clockCam, clockCam.el.currentTime);
+        const t = projTimeOf(clockCam,
+          clockCam._pts >= 0 ? clockCam._pts : clockCam.el.currentTime);
         if(stopReq || t >= b - 0.001){ finish(); return; }
         if(t >= a){
           const who = whoAt(t);
@@ -3621,8 +3937,9 @@ async function fastRender(){
              הפערים תמלא בפריים התקין האחרון. */
           let dev = 0;
           if(who !== 2){ const cc = camForWho(who, t);
-            if(cc) dev = Math.abs(fileTimeOf(cc, t) - cc.el.currentTime); }
-          if(dev > 0.3) skippedDesync++;
+            if(cc) dev = Math.abs(fileTimeOf(cc, t) -
+              (cc._pts >= 0 ? cc._pts : cc.el.currentTime)); }
+          if(dev > 0.15) skippedDesync++;
           else grabFrame(t, who);
           if(frames % 250 === 0) flushParts(false);
           if(frames % 10 === 0){
@@ -3638,7 +3955,8 @@ async function fastRender(){
           let worstLag = 0;
           for(const c of camsAll){
             if(c === clockCam) continue;
-            const lag = fileTimeOf(c, t) - c.el.currentTime;   // חיובי = מפגרת
+            const lag = fileTimeOf(c, t) -
+              (c._pts >= 0 ? c._pts : c.el.currentTime);   // חיובי = מפגרת
             if(lag > worstLag) worstLag = lag;
             const trim = Math.max(-0.08, Math.min(0.15, lag*0.6));
             c.el.playbackRate = Math.max(0.3, Math.min(8, curSpeed*(1+trim)));
@@ -3664,6 +3982,10 @@ async function fastRender(){
         if(camsAll.every(c=>c.el.paused || c.el.ended)){ clearInterval(guard); finish(); }
       }, 4000);
     });
+    };
+
+    if(engine === 'decode'){ engineUsed = 'פענוח ישיר'; await engineDecode(); }
+    else await enginePlayback();
     if(encError) throw encError;
 
     await venc.flush();
@@ -3718,12 +4040,12 @@ async function fastRender(){
       offerDownload(blob, `TEST-podcast-${$('#aspect').value.replace(':','x')}.${ext}`,
         `<b>זו בדיקה של ${fmtDur(b-a)} בלבד, לא הפרק.</b> הורידי ופתחי אותה: ` +
         `אם היא נפתחת, נשמעת ומתחלפת בין הדוברות כמו שצריך — הפרק המלא יעבוד בדיוק אותו דבר.` +
-        `<br>חלקוּת: ${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה.${smoothNote}`);
+        `<br>חלקוּת: ${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה · מנוע: ${engineUsed}.${smoothNote}`);
       return;
     }
     offerDownload(blob, `podcast-${$('#aspect').value.replace(':','x')}.${ext}`,
       `${fmtDur(b-a)} נוצרו ב-${fmtDur(secs)} — פי ${((b-a)/secs).toFixed(1)} מהזמן האמיתי · ` +
-      `${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה · פער מצלמות מרבי ${maxLagSeen.toFixed(2)}ש׳.` +
+      `${uniqFps.toFixed(0)} פריימים ייחודיים לשנייה · מנוע: ${engineUsed}.` +
       smoothNote);
     st(`הסתיים · ${fmtSize(blob.size)} · פי ${((b-a)/secs).toFixed(1)}`);
   }catch(e){
@@ -4046,7 +4368,9 @@ document.addEventListener('visibilitychange', ()=>{
   else if(_hiddenAt){ _hiddenMs += performance.now() - _hiddenAt; _hiddenAt = 0; }
 });
 function drawCover(ctx, v, dx,dy,dw,dh){
-  const vw=v.videoWidth, vh=v.videoHeight; if(!vw||!vh) return;
+  // גם אלמנט וידאו וגם VideoFrame מפוענח
+  const vw=v.videoWidth||v.displayWidth, vh=v.videoHeight||v.displayHeight;
+  if(!vw||!vh) return;
   const s = Math.max(dw/vw, dh/vh), sw = dw/s, sh = dh/s;
   ctx.drawImage(v, (vw-sw)/2, (vh-sh)/2, sw, sh, dx,dy,dw,dh);
 }
