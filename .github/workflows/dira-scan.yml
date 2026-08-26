@@ -1,0 +1,54 @@
+name: סריקת דירות
+
+on:
+  schedule:
+    # כל 30 דקות. GitHub לא מבטיח דיוק בשעות עומס — עיכוב של כמה
+    # דקות הוא נורמלי ולא מעיד על תקלה.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:        # מאפשר להריץ ידנית מלשונית Actions
+
+concurrency:
+  group: dira-scan
+  cancel-in-progress: false # שתי סריקות במקביל היו שולחות כפילויות
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # נדרש כדי לשמור את קובץ המצב בחזרה
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: התקנת תלויות
+        working-directory: telegram-agent
+        run: pip install -r requirements.txt
+
+      # יד2 דורש דפדפן. אם משביתים את מקור yad2 בקונפיג,
+      # אפשר למחוק את הצעד הזה והריצה תתקצר בכדקה.
+      - name: התקנת דפדפן ליד2
+        working-directory: telegram-agent
+        run: python -m playwright install --with-deps chromium
+
+      - name: סריקה
+        working-directory: telegram-agent
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m dira -c config.yaml scan
+
+      - name: שמירת המודעות שכבר נשלחו
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          if [ -n "$(git status --porcelain telegram-agent/state)" ]; then
+            git config user.name  "dira-bot"
+            git config user.email "dira-bot@users.noreply.github.com"
+            git add telegram-agent/state
+            git commit -m "state: מודעות שנשלחו [skip ci]"
+            git push
+          fi
