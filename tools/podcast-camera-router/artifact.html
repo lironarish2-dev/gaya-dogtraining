@@ -167,10 +167,11 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 <div id="rtl-root" dir="rtl" lang="he">
+
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 62</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 65</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -542,10 +543,20 @@ async function probeAllReads(){
     `ודאי שההעתקה הסתיימה לגמרי, וטעני אותם מחדש מהמיקום החדש.`;
   note.scrollIntoView({block:'nearest'});
 }
+let _addBusy = null, _ignoredFiles = [];
 async function addFiles(list){
+  /* שתי הוספות במקביל (גרירה כפולה מהירה) דרסו זו את זו באמצע
+     קיבוץ הטייקים והשיוך האוטומטי. מריצים בתור. */
+  const files = [...list];
+  const run = async ()=>{ try{ await addFilesInner(files); }catch(e){ _logCap('addFiles: '+String(e).slice(0,90)); } };
+  _addBusy = _addBusy ? _addBusy.then(run) : run();
+  return _addBusy;
+}
+async function addFilesInner(list){
+  const ignored = [];
   for(const f of list){
     const kind = guessKind(f);
-    if(!kind){ continue; }
+    if(!kind){ ignored.push(f.name); continue; }
     if(S.clips.some(c=>c.file.name===f.name && c.file.size===f.size)) continue;
     const c = {
       id: 'c'+(++idc), file:f, kind, name:f.name,
@@ -568,6 +579,7 @@ async function addFiles(list){
     el.addEventListener('error', ()=>{ c.broken = true; renderFiles(); updateLocks(); }, {once:true});
     if(kind==='video'){ $('#stage').appendChild(el); el.classList.add('cam'); }
   }
+  _ignoredFiles = ignored;
   groupTakes();
   tryRestoreProject();
   renderFiles();
@@ -758,8 +770,16 @@ function switchTake(k){
 async function makeThumb(c){
   return new Promise(res=>{
     const v = document.createElement('video');
+    v.preload = 'metadata';          // בלי זה הדפדפן מושך קובץ של ג'יגה בשביל ריבוע קטן
     v.src = c.url; v.muted = true; v.playsInline = true;
-    const done = ()=>{ res(); };
+    let cleaned = false;
+    const done = ()=>{
+      /* בלי שחרור מפורש האלמנט הזה מחזיק צינור פענוח פתוח על קובץ
+         של ג'יגה, לכל אורך העבודה. */
+      if(!cleaned){ cleaned = true;
+        try{ v.removeAttribute('src'); v.load(); }catch(e){} }
+      res();
+    };
     v.addEventListener('loadeddata', ()=>{
       try{ v.currentTime = Math.min(3, (v.duration||10)*0.1); }catch(e){ done(); }
     }, {once:true});
@@ -788,6 +808,7 @@ function renderFiles(){
       envBadge = c.envState==='ok'   ? '<span class="badge ok">אודיו נותח</span>'
                : c.envState==='busy' ? `<span class="badge">מנתח ${Math.round((c.progress||0)*100)}% <span class="spin"></span></span>`
                : c.envState==='toobig' ? '<span class="badge">קובץ ענק — סנכרון בניגון מדגם (שלב 2)</span>'
+               : c.envState==='slow' ? '<span class="badge no">הקריאה מהקובץ נתקעה — הוא כנראה בענן או בכונן חיצוני</span>'
                : c.envState==='fail' ? '<span class="badge no">אין אודיו קריא</span>' : '';
     }
     if(c.kind==='video' && c.broken)
@@ -812,7 +833,21 @@ function renderFiles(){
   if(S.clips.length===0){ n.classList.add('hidden'); }
   else if(cams<2){ n.className='note warn'; n.innerHTML='<b>חסרות מצלמות.</b> צריך שני קבצי וידאו כדי לנתב ביניהם.'; }
   else if(mics<2){ n.className='note warn'; n.innerHTML='<b>חסרים מיקרופונים.</b> אפשר להמשיך ולבחור בשלב 3 את האודיו של המצלמות במקום — אבל הזיהוי יהיה פחות מדויק בגלל דליפה בין הדוברים.'; }
+  else if(S.clips.some(c=>c.envState==='slow')){
+    n.className='note err';
+    n.innerHTML = '<b>הקריאה מאחד הקבצים נתקעה.</b> ' +
+      S.clips.filter(c=>c.envState==='slow').map(c=>c.name).join(', ') +
+      ' — קובץ שיושב בתיקיית ענן מסונכרנת (Google Drive / OneDrive / iCloud) או בכונן חיצוני ' +
+      'נקרא דרך הרשת, ולפעמים פשוט לא חוזר.<br><b>מה לעשות:</b> העתיקי את ארבעת הקבצים ' +
+      'לשולחן העבודה, ודאי שההעתקה הסתיימה לגמרי, והסירי וטעני אותם מחדש מהמיקום החדש.';
+  }
   else { n.className='note'; n.innerHTML='הכול כאן. אפשר להמשיך.'; }
+  if(_ignoredFiles.length){
+    n.classList.remove('hidden'); n.className = 'note warn';
+    n.innerHTML = `<b>קבצים שלא נטענו:</b> ${_ignoredFiles.join(', ')}.<br>` +
+      `הכלי מקבל וידאו (mp4/mov/m4v/webm/mkv) ואודיו (wav/mp3/m4a/aac/flac/ogg/aiff). ` +
+      `אם זה בכל זאת קובץ וידאו — שני את הסיומת ל-mp4 ונסי שוב.`;
+  }
 }
 
 function removeClip(id){
@@ -832,6 +867,18 @@ function removeClip(id){
    וקובץ מצלמה יכול להיות כמה ג'יגה — קריאה שלו כולו לזיכרון מפילה את הלשונית.
    לכן WAV נקרא בפרוסות ישירות מהדיסק, ואודיו דחוס (קובץ קטן) מפוענח כרגיל. */
 const isWavFile = f => /\.(wav|wave)$/i.test(f.name) || /wav/i.test(f.type||'');
+/* קריאה מהדיסק שלא חוזרת לעולם היא מצב אמיתי בשטח: תיקיית ענן
+   שנרדמה, כונן רשת, דיסק חיצוני שנשלף. בלי מגבלת זמן הכלי נשאר
+   תקוע במצב "מנתח" בלי הודעה ובלי דרך להמשיך. */
+function withTimeout(promise, ms, what){
+  let tid;
+  return Promise.race([
+    promise.finally(()=>clearTimeout(tid)),
+    new Promise((_, rej)=>{ tid = setTimeout(()=>rej(new Error('read-timeout:'+what)), ms); })
+  ]);
+}
+const readSlice = (file, from, to, ms=90000) =>
+  withTimeout(file.slice(from, to).arrayBuffer(), ms, file.name);
 const DEV_MEM = navigator.deviceMemory || 8;     // ג'יגה, כשהדפדפן מדווח
 const MAX_DECODE = (DEV_MEM <= 4 ? 200 : 700)*1048576;   // בטלפון נזהרים הרבה יותר
 
@@ -859,7 +906,7 @@ function readWavHeader(dv, fileSize){
 }
 
 async function envFromWav(file, onProg){
-  const h = readWavHeader(new DataView(await file.slice(0,8192).arrayBuffer()), file.size);
+  const h = readWavHeader(new DataView(await readSlice(file, 0, 8192, 30000)), file.size);
   if(!h) return null;
   const bps = h.bits>>3, frameBytes = bps*h.channels;
   if(!frameBytes || ![1,3].includes(h.format) || ![8,16,24,32,64].includes(h.bits)) return null;
@@ -879,7 +926,7 @@ async function envFromWav(file, onProg){
   const end = h.dataStart + total*hopBytes;
   while(pos < end && k < total){
     const len = Math.min(CHUNK, end-pos);
-    const ab = await file.slice(pos, pos+len).arrayBuffer();
+    const ab = await readSlice(file, pos, pos+len);
     const i16 = fast16 ? new Int16Array(ab) : null;
     const f32 = fastF32 ? new Float32Array(ab) : null;
     const dv  = (fast16||fastF32) ? null : new DataView(ab);
@@ -957,7 +1004,11 @@ function analyzeClip(c, onProg){
   c._analyzing = (async()=>{
     try{
       let r = null;
-      if(isWavFile(c.file)) r = await envFromWav(c.file, prog);
+      if(isWavFile(c.file)){
+        if(!c._wavHdr)
+          c._wavHdr = readWavHeader(new DataView(await readSlice(c.file, 0, 8192, 30000)), c.file.size) || 'bad';
+        r = await envFromWav(c.file, prog);
+      }
       if(!r){
         if(c.file.size > MAX_DECODE) throw new Error('too-big');
         r = await envFromDecode(c.file);
@@ -968,7 +1019,10 @@ function analyzeClip(c, onProg){
       if(!isFinite(c.dur) && isFinite(r.dur)) c.dur = r.dur;
       c.envState='ok';
     }catch(e){
-      c.envState = (e && e.message==='too-big') ? 'toobig' : 'fail';
+      const msg = (e && e.message) || '';
+      c.envState = msg === 'too-big' ? 'toobig'
+                 : msg.startsWith('read-timeout') ? 'slow' : 'fail';
+      if(c.envState === 'slow') _logCap('קריאה נתקעה: '+c.name);
     }
     c.progress=1;
     renderFiles(); updateLocks();
@@ -1174,7 +1228,10 @@ async function sampleClipWindow(c, startSec, durSec, rate, onProg){
   const nHops = Math.floor(durSec/HOP);
   const db = new Float32Array(nHops);
   const hopSamples = Math.max(1, Math.round(sr*HOP/rate));
-  const proc = actx.createScriptProcessor(256, 1, 1);
+  /* מאגר גדול: 256 דגימות = 188 קריאות בשנייה על החוט הראשי, בדיוק
+     כשהוא מפענח וידאו כבד במהירות כפולה — וקריאה שמאחרת מעוותת את
+     המדידה. 4096 נותן 12 קריאות בשנייה, אותו מידע. */
+  const proc = actx.createScriptProcessor(4096, 1, 1);
   const sink = actx.createGain(); sink.gain.value = 0;
   setGain(c, 0);                                   // שלא יישמע ברמקולים
   c.node.connect(proc); proc.connect(sink); sink.connect(actx.destination);
@@ -1196,12 +1253,20 @@ async function sampleClipWindow(c, startSec, durSec, rate, onProg){
     if(k>=nHops) doneFn();
   };
   try{ c.el.preservesPitch = false; }catch(e){}
+  let landedAt = startSec;
   try{
-    await new Promise((res,rej)=>{
-      const t=setTimeout(res, 5000);
-      c.el.addEventListener('seeked', ()=>{ clearTimeout(t); res(); }, {once:true});
-      try{ c.el.currentTime = startSec; }catch(err){ clearTimeout(t); res(); }
+    /* קפיצה בקובץ של ג'יגה עשויה לקחת יותר מ-5 שניות. קודם המתנו
+       5 שניות ואז המשכנו כאילו הגענו — אבל הניגון התחיל מהמיקום
+       הישן, וכל החישוב נשען על זמן שגוי. עכשיו נותנים לה יותר זמן,
+       ובכל מקרה מודדים היכן היא באמת נחתה. */
+    await new Promise(res=>{
+      const t=setTimeout(res, 20000);
+      const done = ()=>{ clearTimeout(t); res(); };
+      const iv = setInterval(()=>{ if(Math.abs(c.el.currentTime - startSec) < 0.5){ clearInterval(iv); done(); } }, 100);
+      c.el.addEventListener('seeked', ()=>{ clearInterval(iv); done(); }, {once:true});
+      try{ c.el.currentTime = startSec; }catch(err){ clearInterval(iv); done(); }
     });
+    landedAt = c.el.currentTime;
     c.el.playbackRate = rate;
     await c.el.play().catch(()=>{});
     const guard = setTimeout(doneFn, (durSec/rate + 20)*1000);
@@ -1219,7 +1284,9 @@ async function sampleClipWindow(c, startSec, durSec, rate, onProg){
   let lead = 0;
   while(lead < k && db[lead] < -95 && lead*HOP < 1.5) lead++;
   if(k - lead < nHops*0.6) return null;            // הניגון נקטע מוקדם מדי
-  return { db: db.subarray(lead, k), startSec };
+  /* startSec הוא מה שביקשנו; landedAt הוא איפה הניגון באמת התחיל.
+     כשהם שונים, רק השני נכון. */
+  return { db: db.subarray(lead, k), startSec: landedAt };
 }
 /** מיישר מעטפת של חלון מול אות הפעילות המלא של הייחוס */
 function alignWindowToRef(refAct, winDb, centerIdx, radiusIdx){
@@ -1279,6 +1346,7 @@ async function measureCamByPlayback(ref, cam, onStatus){
   const w1 = await sampleClipWindow(cam, t1, winSec, rate,
       p=>say(`חלון ראשון ${Math.round(p*100)}%`));
   if(!w1) return null;
+  if(Math.abs(w1.startSec - t1) > 3) say('הקפיצה נחתה במקום אחר — מתקן לפי המיקום האמיתי');
   const f1 = w1.startSec;                          // הזמן האמיתי בקובץ, מעוגן לשעון האלמנט
   const a1 = alignWindowToRef(refAct, w1.db, Math.round(f1/HOP), Math.round(90/HOP));
   if(!a1 || a1.score < 0.3) return null;
@@ -2184,24 +2252,30 @@ async function wavChunkBuffer(c, fileSec, durSec){
   if(h === 'bad') return null;
   const bps = h.bits>>3, frameBytes = bps*h.channels;
   const totalFrames = Math.floor(h.dataSize/frameBytes);
-  let f0 = Math.round(fileSec*h.sampleRate), n = Math.round(durSec*h.sampleRate);
-  if(f0 < 0){ n += f0; f0 = 0; }
-  if(f0 >= totalFrames || n <= 0) return null;
+  const chs = Math.min(h.channels, 2);
+  const want = Math.round(durSec*h.sampleRate);
+  if(want <= 0) return null;
+  /* חלון שמתחיל לפני תחילת הקובץ: הדגימות שייכות לסוף המקטע, לא
+     לתחילתו. קודם הן נדחפו לתחילתו — כלומר הקול הוקדם בעד שנייה. */
+  let f0 = Math.round(fileSec*h.sampleRate), pad = 0;
+  if(f0 < 0){ pad = Math.min(want, -f0); f0 = 0; }
+  let n = want - pad;
+  if(n <= 0 || f0 >= totalFrames)
+    return pad > 0 ? actx.createBuffer(chs, want, h.sampleRate) : null;
   n = Math.min(n, totalFrames - f0);
   const ab = await c.file.slice(h.dataStart + f0*frameBytes, h.dataStart + (f0+n)*frameBytes).arrayBuffer();
-  const chs = Math.min(h.channels, 2);
-  const buf = actx.createBuffer(chs, n, h.sampleRate);
+  const buf = actx.createBuffer(chs, pad + n, h.sampleRate);
   if(h.format===1 && h.bits===16){
     const i16 = new Int16Array(ab);
     for(let ch=0; ch<chs; ch++){
       const d = buf.getChannelData(ch);
-      for(let i=0;i<n;i++) d[i] = i16[i*h.channels+ch]/32768;
+      for(let i=0;i<n;i++) d[pad+i] = i16[i*h.channels+ch]/32768;
     }
   } else {
     const dv = new DataView(ab);
     for(let ch=0; ch<chs; ch++){
       const d = buf.getChannelData(ch);
-      for(let i=0;i<n;i++) d[i] = readSampleAt(dv, (i*h.channels+ch)*bps, h.bits, h.format);
+      for(let i=0;i<n;i++) d[pad+i] = readSampleAt(dv, (i*h.channels+ch)*bps, h.bits, h.format);
     }
   }
   return buf;
@@ -2401,7 +2475,14 @@ function preRoll(){
     c._prerollFor = next.start;
     c._prerollUntil = next.start + 1;
     if(c.el.paused){
-      try{ c.el.currentTime = clamp(fileTimeOf(c, next.start), 0, (c.dur||1)-0.05); }catch(e){}
+      /* מעירים אותה אל הזמן הנוכחי, לא אל זמן החיתוך. קפיצה קדימה
+         נראית מסונכרנת רק לרגע: מיד אחריה תיקון-הסנכרון מחזיר אותה
+         אחורה, וכל מעבר עלה בשתי קפיצות בקובץ של ג'יגה. */
+      const tgt = fileTimeOf(c, player.t + 0.3);
+      if(Math.abs(c.el.currentTime - tgt) > 0.6){
+        c._seekAt = performance.now();               // חוסם קפיצת תיקון מיותרת
+        try{ c.el.currentTime = clamp(tgt, 0, (c.dur||1)-0.05); }catch(e){}
+      }
       c.el.play().catch(()=>{});
     }
   }
@@ -3601,12 +3682,31 @@ async function fastRenderSupported(){
   return !!(await pickCodecs(1280, 720));
 }
 
+let _encV = null, _encA = null;
 let _probe = null;      // {a,b,ok} — ריצת בדיקה קצרה, בלי הורדה
 let _trial = null;      // {a,b} — בדיקה של דקה, כן מורידה
 /* אחרי שהדרך המהירה נכשלה פעם אחת על הקבצים האלה — לא מנסים אותה
    שוב באותו מחשב. ההחלטה נשמרת, וכל היצירות עוברות לדרך האמינה. */
-function fastBroken(){ try{ return localStorage.getItem('pr-fastbad-v52')==='1'; }catch(e){ return false; } }
-function markFastBroken(){ try{ localStorage.setItem('pr-fastbad-v52','1'); }catch(e){} }
+/* המפתח נושא את מספר המנוע: כשהמנוע מוחלף, החלטה ישנה על מנוע
+   ישן אינה רלוונטית ונמחקת מאליה. בנוסף ההחלטה פגה אחרי שבוע —
+   מחשב שהיה עמוס פעם אחת לא נענש לתמיד. */
+const FASTBAD_KEY = 'pr-fastbad-v63';
+function fastBroken(){
+  try{
+    const v = localStorage.getItem(FASTBAD_KEY);
+    if(!v) return false;
+    const at = parseInt(v, 10);
+    if(!at || Date.now() - at > 7*864e5){ localStorage.removeItem(FASTBAD_KEY); return false; }
+    return true;
+  }catch(e){ return false; }
+}
+function markFastBroken(){
+  try{
+    localStorage.setItem(FASTBAD_KEY, String(Date.now()));
+    for(const k of ['pr-fastbad-v52','pr-fastbad-v58']) localStorage.removeItem(k);
+  }catch(e){}
+}
+function clearFastBroken(){ try{ localStorage.removeItem(FASTBAD_KEY); }catch(e){} }
 async function fastRender(){
   if(rendering) return;
   if(!S.cuts.length){ $('#renderStatus').textContent='קודם חשבי ניתוב.'; return; }
@@ -3614,7 +3714,9 @@ async function fastRender(){
   if(!_probe && !rangeReady()) return;
   const a = _probe ? _probe.a : (_trial ? _trial.a : S.t0);
   const b = _probe ? _probe.b : (_trial ? _trial.b : S.t1);
-  if(b-a > 16*60 && !confirm('קטע ארוך מ-16 דקות במסלול המהיר דורש הרבה זיכרון. להמשיך? (אפשר גם לבטל ולהשתמש ביצירה הרגילה)')) return;
+  /* האזהרה הזאת נולדה כשכל הקובץ נצבר בזיכרון. מאז הקטעים נארזים
+     ומשוחררים תוך כדי, והזיכרון אינו תלוי עוד באורך הפרק — אבל
+     החלון נשאר וחסם כל פרק אמיתי. */
   const [aw,ah] = $('#aspect').value.split(':').map(Number);
   const q = parseInt($('#quality').value,10);
   let W,H;
@@ -3637,14 +3739,21 @@ async function fastRender(){
     if(!picked) throw new Error('הדפדפן לא מקודד וידאו');
     const MP4 = picked.container === 'mp4';
     const videoChunks=[], audioChunks=[];
-    let encError = null, avcC = null, asc = null;
+    let encError = null, avcC = null, asc = null, outOfOrder = false;
+    /* ההפרש בין זמן הפענוח של הפריים הראשון לזמן התצוגה שלו. עם
+       B-frames הוא שני פריימים, ובלעדיהם אפס. רצועת הקול מוזזת
+       באותו הפרש בדיוק, אחרת התמונה מפגרת אחרי הקול לכל האורך. */
+    let vShift = 0;
     const venc = new VideoEncoder({
       output:(c, meta)=>{
         if(meta && meta.decoderConfig && meta.decoderConfig.description && !avcC)
           avcC = new Uint8Array(meta.decoderConfig.description);
         const d=new Uint8Array(c.byteLength); c.copyTo(d);
+        if(videoChunks.length && c.timestamp < videoChunks[videoChunks.length-1].timestamp)
+          outOfOrder = true;
         videoChunks.push({timestamp:c.timestamp, type:c.type, data:d}); },
       error:(e)=>{ encError = e; } });
+    _encV = venc;
     venc.configure(picked.v);
     const aenc = new AudioEncoder({
       output:(c, meta)=>{
@@ -3653,31 +3762,98 @@ async function fastRender(){
         const d=new Uint8Array(c.byteLength); c.copyTo(d);
         audioChunks.push({timestamp:c.timestamp, data:d}); },
       error:(e)=>{ encError = e; } });
+    _encA = aenc;
     aenc.configure(picked.a);
 
-    // אודיו: קוראים את המיקס ישירות מקבצי ה-WAV ומקודדים בבת אחת
+    /* ---------- הסאונד של הקובץ הסופי ----------
+       הקובץ נכתב תמיד ב-48kHz. קודם הדגימות הועתקו אחת-לאחת בלי המרת
+       קצב: מיקרופון של 44.1kHz נתן בכל שנייה 0.92ש׳ של קול מואץ ועוד
+       0.08ש׳ של שקט — קול קצוץ שנשמע כמו "הסנכרון נשבר". עכשיו יש
+       המרת קצב אמיתית, והיא גם מכבדת את קצב-השעון שנמדד בסנכרון. */
     st('מקודדת את הסאונד…');
     const mics = [clip(S.people[0].micId), clip(S.people[1].micId)].filter(Boolean);
+    if(!mics.length) throw new Error('אין מיקרופונים לייצוא — בחרי מיקרופון לכל דוברת בשלב 3.');
     const SR = 48000, CH = 1.0;
+    /* מיקרופון דחוס (mp3/m4a) אין ממנו זרימה מהדיסק — מפענחים פעם
+       אחת לזיכרון. קודם הוא פשוט דולג, והקובץ הסופי יצא בלי קול. */
+    const pcmOf = async m => {
+      if(m._pcm48) return m._pcm48;
+      if(m.file.size > 350*1048576)
+        throw new Error(`קובץ המיקרופון ${m.name} דחוס וגדול מדי לפענוח בדפדפן. ` +
+          `בקשי מהאולפן את המיקרופונים כ-WAV — אותם הכלי מזרים ישירות מהדיסק בלי מגבלת גודל.`);
+      const ac = new OfflineAudioContext(1, 1, SR);
+      const dbuf = await ac.decodeAudioData(await m.file.arrayBuffer());
+      const L = dbuf.length, c0 = dbuf.getChannelData(0);
+      const c1 = dbuf.numberOfChannels > 1 ? dbuf.getChannelData(1) : null;
+      const mono = new Float32Array(L);
+      for(let i=0;i<L;i++) mono[i] = c1 ? (c0[i]+c1[i])*0.5 : c0[i];
+      m._pcm48 = { d: mono, sr: dbuf.sampleRate };
+      return m._pcm48;
+    };
+    /* מחזיר בדיוק n דגימות מונו ב-48kHz עבור חלון הפרויקט [projT, +len) */
+    const micMono = async (m, projT, len, n)=>{
+      const out = new Float32Array(n);
+      const rate = m.rate || 1, ft0 = fileTimeOf(m, projT);
+      let d, sr0, off0;
+      if(isWavFile(m.file)){
+        const buf = await wavChunkBuffer(m, ft0, len*rate + 0.06);
+        if(!buf) return out;
+        sr0 = buf.sampleRate; off0 = 0;
+        const b0 = buf.getChannelData(0);
+        if(buf.numberOfChannels > 1){
+          const b1 = buf.getChannelData(1);
+          d = new Float32Array(b0.length);
+          for(let i=0;i<b0.length;i++) d[i] = (b0[i]+b1[i])*0.5;
+        } else d = b0;
+      } else {
+        const P = await pcmOf(m);
+        d = P.d; sr0 = P.sr; off0 = ft0*sr0;      // דגימה 0 של הקובץ = זמן 0
+      }
+      const step = rate*sr0/SR;                    // דגימות מקור לכל דגימת יעד
+      for(let i=0;i<n;i++){
+        const x = off0 + i*step;
+        if(x < 0) continue;                        // לפני תחילת הקובץ — שקט
+        const j = x|0;
+        if(j+1 >= d.length){ if(j < d.length) out[i] = d[j]; break; }
+        const f = x - j;
+        out[i] = d[j]*(1-f) + d[j+1]*f;
+      }
+      return out;
+    };
+    const gain = mics.length > 1 ? 0.7 : 1;
+    let aChunks = 0;
     for(let t = a; t < b; t += CH){
       const len = Math.min(CH, b-t);
       const n = Math.round(len*SR);
+      if(n < 1) break;              // שארית של שבריר דגימה — AudioData היה זורק כאן
       const mix = new Float32Array(n);
       for(const m of mics){
-        const buf = isWavFile(m.file) ? await wavChunkBuffer(m, fileTimeOf(m, t), len*(m.rate||1)) : null;
-        if(!buf) continue;
-        const src = buf.getChannelData(0);
-        const k = Math.min(n, src.length);
-        if(buf.numberOfChannels>1){
-          const s2 = buf.getChannelData(1);
-          for(let i=0;i<k;i++) mix[i] += (src[i]+s2[i])*0.35;
-        } else for(let i=0;i<k;i++) mix[i] += src[i]*0.5;
+        const part = await micMono(m, t, len, n);
+        for(let i=0;i<n;i++) mix[i] += part[i]*gain;
       }
-      aenc.encode(new AudioData({format:'f32-planar', sampleRate:SR, numberOfFrames:n,
-        numberOfChannels:1, timestamp:Math.round((t-a)*1e6), data:mix}));
+      for(let i=0;i<n;i++){                 // חיתוך בטווח — מונע עיוות בקידוד
+        if(mix[i] > 1) mix[i] = 1; else if(mix[i] < -1) mix[i] = -1;
+      }
+      const ad = new AudioData({format:'f32-planar', sampleRate:SR, numberOfFrames:n,
+        numberOfChannels:1, timestamp:Math.round((t-a)*1e6), data:mix});
+      aenc.encode(ad);
+      /* AudioData מחזיק זיכרון מחוץ לערמת ה-JS. בלי סגירה מפורשת
+         דלפו כאן מאות מגה־בייטים בפרק שלם. */
+      try{ ad.close(); }catch(e){}
       if(encError) throw encError;
+      while((aenc.encodeQueueSize || 0) > 40 && !encError) await new Promise(r=>setTimeout(r, 4));
+      if((++aChunks & 31) === 0){
+        st(`מקודדת את הסאונד… ${Math.round((t-a)/Math.max(b-a,1)*100)}%`);
+        $('#renderProg').value = clamp((t-a)/Math.max(b-a,1)*0.08, 0, 1);
+        await new Promise(r=>setTimeout(r, 0));
+      }
+      if(stopReq) break;
     }
     await aenc.flush();
+    if(encError) throw encError;
+    if(!audioChunks.length)
+      throw new Error('לא נוצר שום סאונד מקבצי המיקרופון — הקובץ היה יוצא אילם. ' +
+        'בדקי בשלב 3 שלכל דוברת משויך קובץ מיקרופון תקין.');
 
     /* וידאו: לא קופצים פריים-פריים (כל seek עולה עשרות מ"ש ומבטל את
        היתרון). במקום זה מנגנים כל קטע ברצף במהירות מוגברת ותופסים
@@ -3722,9 +3898,25 @@ async function fastRender(){
        באמצע בזמן שהמקודד עוד עשוי לפלוט אליו. */
     const flushParts = (final)=>{
       if(!MP4 || !avcC) return;            // WebM נארז בסוף כרגיל
+      /* אריזה מצטברת בטוחה רק כשהמקודד פולט לפי סדר התצוגה. פלט לא
+         מסודר (B-frames) מפזר חותמות בין הקבוצות ושובר את הקובץ
+         מאמצעו — במקרה כזה אורזים הכול פעם אחת בסוף, עם מיון גלובלי. */
+      if(outOfOrder && !final) return;
+      if(outOfOrder && final){
+        fileParts.length = 0; headerDone = false; mp4Seq = 1;
+        /* עכשיו כל הפריימים ביד. מחפשים את ההיסט השלילי הגדול ביותר
+           — כלומר את הדגימה שזמן התצוגה שלה מקדים את זמן הפענוח
+           הכי הרבה. הזזה של כל התצוגה קדימה במידה הזאת מאפסת את כל
+           ההיסטים השליליים, והקול זז איתה. */
+        const ps = videoChunks.map(c=>Math.round(c.timestamp/1e6*VT));
+        const ds = ps.slice().sort((x,y)=>x-y);
+        vShift = 0;
+        for(let i=0;i<ps.length;i++) if(ds[i]-ps[i] > vShift) vShift = ds[i]-ps[i];
+      }
       if(!headerDone){
         fileParts.push(new Blob([mp4Head({ width:W, height:H, vTimescale:VT, aTimescale:AT,
-          channels:1, durationMs:(b-a)*1000, avcC, asc: asc || new Uint8Array([0x11,0x90]) })]));
+          channels:1, durationMs:(b-a)*1000 + vShift/VT*1000,
+          avcC, asc: asc || new Uint8Array([0x11,0x90]) })]));
         headerDone = true;
       }
       const lastTs = videoChunks.length ? videoChunks[videoChunks.length-1].timestamp/1e6 : 0;
@@ -3734,11 +3926,19 @@ async function fastRender(){
       while(videoChunks.length && videoChunks[0].timestamp/1e6 < upTo) takeV.push(videoChunks.shift());
       while(audioChunks.length && audioChunks[0].timestamp/1e6 < upTo) takeA.push(audioChunks.shift());
       if(takeV.length){
-        const fr = mp4Split(mkSamples(takeV, VT, false), VT, 2);
+        const vArr = mkSamples(takeV, VT, false);
+        /* התצוגה זזה קדימה; הפענוח נשאר במקומו — כך כל היסט תצוגה
+           יוצא אי-שלילי, והנגן אינו צריך "לתקן" את הרצועה בעצמו. */
+        if(vShift) for(const s of vArr){ s.pts += vShift; s.cto += vShift; }
+        const fr = mp4Split(vArr, VT, 2);
         for(const f of fr) fileParts.push(new Blob([mp4Fragment(1, f.samples, f.base, mp4Seq++)]));
       }
       if(takeA.length){
-        const fr = mp4Split(mkSamples(takeA, AT, true), AT, 2);
+        const aArr = mkSamples(takeA, AT, true);
+        /* הזזת הקול כך שיתחיל יחד עם הפריים הראשון שמוצג */
+        const aOff = Math.round(vShift/VT*AT);
+        if(aOff) for(const s of aArr){ s.dts += aOff; s.pts += aOff; }
+        const fr = mp4Split(aArr, AT, 2);
         for(const f of fr) fileParts.push(new Blob([mp4Fragment(2, f.samples, f.base, mp4Seq++)]));
       }
       flushedTo = isFinite(upTo) ? upTo : flushedTo;
@@ -4060,9 +4260,11 @@ async function fastRender(){
       const v = document.createElement('video');
       const u = URL.createObjectURL(blob);
       v.preload = 'metadata'; v.muted = true;
-      v.onloadedmetadata = ()=>{ const d = v.duration; URL.revokeObjectURL(u); res(d); };
-      v.onerror = ()=>{ URL.revokeObjectURL(u); res(-1); };
-      setTimeout(()=>res(-2), 12000);
+      const fin = d => { try{ v.removeAttribute('src'); v.load(); }catch(e){}
+        URL.revokeObjectURL(u); res(d); };
+      v.onloadedmetadata = ()=>fin(v.duration);
+      v.onerror = ()=>fin(-1);
+      setTimeout(()=>fin(-2), 12000);
       v.src = u;
     });
     // עצירה יזומה מייצרת קובץ קצר בכוונה — זה לא כשל
@@ -4099,11 +4301,17 @@ async function fastRender(){
       smoothNote + renderDiagLine());
     st(`הסתיים · ${fmtSize(blob.size)} · פי ${((b-a)/secs).toFixed(1)}`);
   }catch(e){
-    markFastBroken();
+    /* עצירה שהמשתמשת ביקשה אינה כשל של המנוע — ובעבר היא פסלה אותו
+       לתמיד וכל יצירה הבאה רצה בקצב אמיתי. */
+    if(!stopReq) markFastBroken();
     if(_probe){ _probe.ok = false; _probe.why = String(e && e.message ? e.message : e); }
     else if(_trial){ _trial.failed = e; }
     else { st('היצירה המהירה נכשלה.'); renderFailed(e); }
   }finally{
+    /* מקודד שלא נסגר תופס משאב חומרה. אחרי כמה ריצות הדפדפן מסרב
+       לפתוח עוד אחד, והיצירה הבאה נכשלת בלי סיבה גלויה. */
+    for(const enc of [_encV, _encA]){ try{ if(enc && enc.state !== 'closed') enc.close(); }catch(e){} }
+    _encV = _encA = null;
     keepAwake(false);
     rendering=false; stopReq=false;
     $('#fastRenderBtn').disabled=false; $('#renderBtn').disabled=false;
@@ -4126,7 +4334,7 @@ $('#trialBtn').onclick = async ()=>{
   box.className = ''; box.innerHTML = '<b>מריצה בדיקה של דקה…</b><br>' +
     '<span style="font-size:.85rem">יוצרת קטע קצר מאמצע הפרק, בדיוק באותה דרך שבה ייווצר הפרק המלא.</span>';
   const mid = Math.max(S.t0, Math.min(S.t1 - 31, (S.t0 + S.t1)/2));
-  const runSlow = ()=> new Promise(r=>{ _trialDone = r; $('#renderBtn').onclick(); });
+  const runSlow = ()=> new Promise(r=>{ _trialDone = r; _autoSlow = true; $('#renderBtn').onclick(); });
   /* אם הדרך המהירה נכשלת — לא עוצרים עם הודעת שגיאה. עוברים מיד
      לדרך האמינה, מפיקים את אותה בדיקה, וההחלטה נשמרת גם ליצירת
      הפרק המלא. המשתמשת לא צריכה לבחור כלום. */
@@ -4168,7 +4376,7 @@ $('#makeBtn').onclick = async ()=>{
     _probe = { a: mid, b: Math.min(mid + 15, S.t1), ok: false };
     try{ await fastRender(); }catch(e){ _probe.ok = false; }
     useFast = !!_probe.ok;
-    if(!useFast) markFastBroken();
+    if(!useFast && !stopReq) markFastBroken();
     const why = _probe.why || '';
     _probe = null;
     box.className = '';
@@ -4180,7 +4388,7 @@ $('#makeBtn').onclick = async ()=>{
   }
   btn.disabled = false;
   if(useFast) await fastRender();
-  else $('#renderBtn').onclick();
+  else { _autoSlow = true; $('#renderBtn').onclick(); }
 };
 /* קודם הכפתור האיטי היה הבולט והמהיר היה מוסתר — ולכן הלחיצה הטבעית
    הובילה ליצירה בקצב אמיתי, שעה על פרק של שעה. עכשיו רואים מראש מה
@@ -4254,13 +4462,16 @@ async function describeRenderPlan(){
   el.innerHTML = `הקובץ שייווצר: <b>${dur}</b> — הפרק המלא.<br>` +
     `פורמט <b>${fmt}</b>. ` +
     (fastBroken()
-      ? `הדרך המהירה כבר נכשלה על הקבצים האלה, ולכן היצירה תרוץ בדרך האמינה — בערך <b>${dur}</b>.<br>`
+      ? `<b>שימי לב:</b> בפעם קודמת הדרך המהירה נכשלה כאן, ולכן היצירה תרוץ בדרך האיטית — בערך <b>${dur}</b>. ` +
+        `<button class="ghost sm" id="retryFast" style="margin-inline-start:.4rem">🔄 לנסות שוב את הדרך המהירה</button><br>`
       : `הכלי יבדוק לבד איזו דרך מתאימה למחשב הזה — זה ייקח בין <b>${est}</b> ל-${dur}.<br>`) +
     `<b>חשוב:</b> אל תעברי ללשונית אחרת ואל תתני למסך להיכבות — הדפדפן מקפיא עיבוד ברקע. ` +
     `הכלי ינסה למנוע את כיבוי המסך בעצמו.<br>` +
     `<b>מומלץ:</b> לחצי קודם על <b>🔎 בדיקה של דקה</b> — היא מוכיחה שהכל עובד, כולל ההורדה, ` +
     `במקום להמתין ${dur} ולגלות בסוף.` +
     why + (S.coverNote ? `<br><br>${S.coverNote}` : '');
+  const rf = document.getElementById('retryFast');
+  if(rf) rf.onclick = ()=>{ clearFastBroken(); describeRenderPlan(); };
 }
 describeRenderPlan();
 ['#quality','#aspect'].forEach(sel=>{ const e=$(sel); if(e) e.addEventListener('change', describeRenderPlan); });
@@ -4279,7 +4490,12 @@ function drawNameTag(ctx, W, H, who){
     const bx = who===2 ? (i===0 ? W*0.25 - bw/2 : W*0.75 - bw/2) : W - bw - H*0.04;
     const by = H - bh - H*0.045;
     ctx.fillStyle = 'rgba(20,19,18,.62)';
-    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, bh/2); ctx.fill();
+    ctx.beginPath();
+    /* roundRect לא קיים בספארי לפני 16.4 — בלי הנפילה-לאחור כל פריים
+       זרק שגיאה והיצירה כולה נעצרה. */
+    if(ctx.roundRect) ctx.roundRect(bx, by, bw, bh, bh/2);
+    else ctx.rect(bx, by, bw, bh);
+    ctx.fill();
     ctx.fillStyle = '#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(nm, bx+bw/2, by+bh/2+fs*0.06);
   });
@@ -4348,22 +4564,33 @@ function renderDiagLine(){
       const w=c.el.videoWidth||0, h=c.el.videoHeight||0;
       const sync = c._syncWin===2 ? `קצב ${((c.rate||1)).toFixed(5)} ✓`
                  : c._syncWin===1 ? 'קצב לא נמדד ⚠️' : '';
-      return `${c.name}: ${w&&h ? w+'×'+h : 'רזולוציה לא ידועה'} · ` +
+      const fpsTxt = (()=>{ try{
+        const idx = c._idx; if(!idx || idx.n < 12) return '';
+        const d = []; for(let i=1;i<Math.min(idx.n,200);i++) d.push(idx.dts[i]-idx.dts[i-1]);
+        d.sort((x,y)=>x-y); const med = d[d.length>>1];
+        return med > 0 ? ` · ${Math.round(1/med)}fps` : '';
+      }catch(e){ return ''; } })();
+      return `${c.name}: ${w&&h ? w+'×'+h : 'רזולוציה לא ידועה'}${fpsTxt} · ` +
              `${(c.file.size/1073741824).toFixed(2)}GB · ` +
              `קריאה ${c._readMbs>0 ? c._readMbs.toFixed(0)+'MB/s' : 'לא נמדדה'}` +
              ` · היסט ${(c.offset>=0?'+':'')}${c.offset.toFixed(2)}ש׳` +
              (sync ? ' · '+sync : '') +
              ((w>=3000||h>=1600) ? ' ⚠️' : '');
     });
-    /* גם המיקרופונים — היסט ידני שנשאר בהם מזיז את כל הסנכרון בקובץ */
-    for(const m of S.clips.filter(c=>c.kind==='audio'))
-      rows.push(`${m.name}: היסט ${(m.offset>=0?'+':'')}${m.offset.toFixed(2)}ש׳`);
+    /* גם המיקרופונים — היסט ידני שנשאר בהם מזיז את כל הסנכרון בקובץ,
+       וקצב הדגימה קובע אם הקול בקובץ הסופי יוצא חלק. */
+    for(const m of S.clips.filter(c=>c.kind==='audio')){
+      const h = m._wavHdr && m._wavHdr !== 'bad' ? m._wavHdr : null;
+      rows.push(`${m.name}: היסט ${(m.offset>=0?'+':'')}${m.offset.toFixed(2)}ש׳` +
+        (h ? ` · ${h.sampleRate}Hz · ${h.channels===1?'מונו':'סטריאו'} · ${h.bits} ביט` : ''));
+    }
     const noRate = cams.some(c=>c._syncWin===1);
     const fourK = cams.some(c=>(c.el.videoWidth||0)>=3000 || (c.el.videoHeight||0)>=1600);
     const slowRead = cams.some(c=>c._readMbs>0 && c._readMbs<25);
     return `<div style="font-size:.8rem;margin-top:.6rem;padding-top:.5rem;border-top:1px solid rgba(0,0,0,.15)">` +
       `<b>נתונים לאבחון:</b><br>${rows.join('<br>')}<br>` +
       `דפדפן: ${(navigator.userAgent.match(/(Edg|Chrome|Firefox)\/[\d.]+/)||navigator.userAgent.match(/Version\/[\d.]+ Safari/)||['לא ידוע'])[0]}` +
+      (fastBroken() ? ` · <b>הדרך המהירה מסומנת כשבורה</b> (יש כפתור לבטל בשלב 6)` : '') +
       (fourK ? `<br><br><b>⚠️ המצלמות ברזולוציה גבוהה מ-1080p — זה כנראה הגורם המרכזי.</b> ` +
                `פענוח 4K בדפדפן כבד פי ארבעה. בקשי מהאולפן את אותם קבצים ב-1080p — והכל צפוי לעבוד.` : '') +
       (slowRead ? `<br><br><b>⚠️ הקריאה מהדיסק איטית מאוד — הקבצים כנראה בענן.</b> העתיקי לשולחן העבודה וטעני מחדש.` : '') +
@@ -4399,7 +4626,7 @@ function rangeReady(){
 /* הדפדפן מקפיא עיבוד בלשונית שברקע, ומכבה אותו לגמרי כשהמסך נרדם.
    רינדור של חצי שעה נעצר באמצע בדיוק מהסיבה הזאת. נעילת מסך מונעת
    את השינה, והאירוע מחזיר אותה אחרי כל חזרה מרקע. */
-let _wakeLock = null, _trialDone = null;
+let _wakeLock = null, _trialDone = null, _autoSlow = false;
 async function keepAwake(on){
   try{
     if(on){
@@ -4435,12 +4662,16 @@ $('#renderBtn').onclick = async ()=>{
   if(!rangeReady()) return;
   /* כשהמסלול המהיר זמין ומפיק את אותו פורמט, אין שום סיבה לחכות פי
      כמה. קל ללחוץ על הכפתור הלא נכון, ואז ההמתנה ארוכה בלי צורך. */
-  if(!$('#fastRenderBtn').classList.contains('hidden') && _fastFormat === 'mp4'){
-    const span = (S.outPoint ?? S.t1) - (S.inPoint ?? S.t0);
+  /* השאלה הזאת נשאלת רק כשהמשתמשת בחרה במפורש בדרך האיטית. כשהכלי
+     עובר אליה בעצמו אחרי כשלון של המהירה, שאלה כאן היא מלכודת:
+     "לא" מסיים את התהליך בלי קובץ ובלי הסבר. */
+  if(!_autoSlow && !$('#fastRenderBtn').classList.contains('hidden') && _fastFormat === 'mp4'){
+    const span = S.t1 - S.t0;
     if(!confirm(`רגע — היצירה המהירה נותנת בדיוק את אותו קובץ MP4, והרבה יותר מהר:\n\n` +
         `⚡ מהירה: בערך ${fmtDur(span/4)}\n🐢 איטית: ${fmtDur(span)}\n\n` +
         `להמשיך דווקא באיטית?`)) return;
   }
+  _autoSlow = false;
   const [aw,ah] = $('#aspect').value.split(':').map(Number);
   const q = parseInt($('#quality').value,10);
   let W,H;
@@ -4574,11 +4805,16 @@ $('#renderBtn').onclick = async ()=>{
     const who = whoAt(player.t);
     ctx.fillStyle='#141312'; ctx.fillRect(0,0,W,H);
     if(who===2){
-      const c0=clip(S.people[0].camId), c1=clip(S.people[1].camId);
-      if(c0) drawCover(ctx, c0.el, 0,0, W/2, H);
-      if(c1) drawCover(ctx, c1.el, W/2,0, W/2, H);
+      const live = [clip(S.people[0].camId), clip(S.people[1].camId)]
+        .filter(c=>c && camCovers(c, player.t));
+      if(live.length === 2){
+        drawCover(ctx, live[0].el, 0,0, W/2, H);
+        drawCover(ctx, live[1].el, W/2,0, W/2, H);
+      } else if(live.length) drawCover(ctx, live[0].el, 0,0, W, H);
     } else {
-      const c = clip(S.people[who].camId);
+      /* camForWho ולא המצלמה הישירה: מצלמה שנגמרה באמצע הפרק החזירה
+         מסך שחור עד הסוף במקום להציג את השנייה. */
+      const c = camForWho(who, player.t);
       if(c) drawCover(ctx, c.el, 0,0, W, H);
     }
     drawNameTag(ctx, W, H, who);
@@ -4842,4 +5078,5 @@ document.addEventListener('visibilitychange', ()=>{
 
 load(); refreshSelects(); updateLocks(); inOutLbl(); drawAll();
 </script>
+
 </div>
