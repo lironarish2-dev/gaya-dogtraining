@@ -16,6 +16,16 @@
     --accent-soft:#DFECEC;
     --sand:      #9A6C24;
     --sand-soft: #F3E9D6;
+
+    --fresh:     #256B45;
+    --fresh-bg:  #DCEEE3;
+    --mid:       #8A6414;
+    --mid-bg:    #F5EBD3;
+    --old:       #8E5A34;
+    --old-bg:    #F2E4D9;
+    --dead:      #933A3A;
+    --dead-bg:   #F3DEDE;
+
     --shadow:    0 1px 2px rgba(20,32,31,.05), 0 8px 24px -12px rgba(20,32,31,.18);
 
     color-scheme: light dark;
@@ -35,6 +45,16 @@
       --accent-soft:#14302F;
       --sand:      #D3A75C;
       --sand-soft: #2C2413;
+
+      --fresh:     #7CC79B;
+      --fresh-bg:  #16301F;
+      --mid:       #DCB565;
+      --mid-bg:    #302711;
+      --old:       #D69A72;
+      --old-bg:    #2F2118;
+      --dead:      #DE8B8B;
+      --dead-bg:   #331A1A;
+
       --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
     }
   }
@@ -51,6 +71,16 @@
     --accent-soft:#14302F;
     --sand:      #D3A75C;
     --sand-soft: #2C2413;
+
+    --fresh:     #7CC79B;
+    --fresh-bg:  #16301F;
+    --mid:       #DCB565;
+    --mid-bg:    #302711;
+    --old:       #D69A72;
+    --old-bg:    #2F2118;
+    --dead:      #DE8B8B;
+    --dead-bg:   #331A1A;
+
     --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
   }
 
@@ -69,7 +99,7 @@
   }
 
   .wrap {
-    max-width: 940px;
+    max-width: 1020px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -111,24 +141,16 @@
     margin: 0;
   }
 
-  h1 em {
-    font-style: normal;
-    color: var(--accent);
-  }
+  h1 em { font-style: normal; color: var(--accent); }
 
   .standfirst {
     font-size: clamp(17px, 2.2vw, 19px);
     color: var(--muted);
-    max-width: 62ch;
+    max-width: 64ch;
     margin: 0;
   }
 
-  .criteria {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-top: 2px;
-  }
+  .criteria { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .chip {
     display: inline-flex;
@@ -142,11 +164,7 @@
     font-weight: 600;
   }
 
-  .chip span {
-    font-weight: 400;
-    color: var(--muted);
-    font-size: 13px;
-  }
+  .chip span { font-weight: 400; color: var(--muted); font-size: 13px; }
 
   .chip.is-pet {
     background: var(--sand-soft);
@@ -155,6 +173,40 @@
   }
 
   .chip.is-pet span { color: inherit; opacity: .8; }
+
+  /* ---------- tally ---------- */
+
+  .tally {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .tally div {
+    background: var(--surface);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tally b {
+    font-family: "Frank Ruhl Libre", Georgia, serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tally small {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: .02em;
+  }
 
   /* ---------- notice ---------- */
 
@@ -166,7 +218,7 @@
     padding: 18px 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .notice h2 {
@@ -177,20 +229,12 @@
     color: var(--sand);
   }
 
-  .notice p {
-    margin: 0;
-    font-size: 15.5px;
-    color: var(--muted);
-    max-width: 68ch;
-  }
+  .notice p { margin: 0; font-size: 15.5px; color: var(--muted); max-width: 74ch; }
+  .notice p b { color: var(--ink); }
 
   /* ---------- sections ---------- */
 
-  section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+  section { display: flex; flex-direction: column; gap: 20px; }
 
   .sec-head {
     display: flex;
@@ -200,12 +244,7 @@
     padding-top: 18px;
   }
 
-  .sec-title {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  .sec-title { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 
   .rank {
     font-family: "IBM Plex Mono", monospace;
@@ -215,7 +254,6 @@
     background: var(--accent);
     border-radius: 3px;
     padding: 3px 8px;
-    letter-spacing: .02em;
     white-space: nowrap;
   }
 
@@ -227,18 +265,100 @@
     margin: 0;
   }
 
-  .sec-note {
+  .sec-note { font-size: 15.5px; color: var(--muted); margin: 0; max-width: 72ch; }
+  .sec-note b { color: var(--ink); }
+
+  /* ---------- listing tables ---------- */
+
+  .table-scroll { overflow-x: auto; border-radius: 6px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
     font-size: 15.5px;
-    color: var(--muted);
-    margin: 0;
-    max-width: 68ch;
+    min-width: 660px;
   }
+
+  th, td {
+    text-align: start;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  thead th {
+    background: var(--surface-2);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+
+  td.where { font-weight: 700; white-space: nowrap; }
+  td.what { color: var(--muted); font-size: 15px; }
+
+  td.price {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  td.rooms {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  td.go a {
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+
+  td.go a:hover { border-bottom-color: var(--accent); }
+
+  .pill {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 3px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+
+  .p-fresh { background: var(--fresh-bg); color: var(--fresh); }
+  .p-mid   { background: var(--mid-bg);   color: var(--mid); }
+  .p-old   { background: var(--old-bg);   color: var(--old); }
+  .p-dead  { background: var(--dead-bg);  color: var(--dead); }
+
+  .star { color: var(--sand); font-weight: 700; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
 
   /* ---------- link cards ---------- */
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
     gap: 12px;
   }
 
@@ -256,24 +376,10 @@
     transition: border-color .16s ease, transform .16s ease;
   }
 
-  .card:hover,
-  .card:focus-visible {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
+  .card:hover, .card:focus-visible { border-color: var(--accent); transform: translateY(-2px); }
 
-  .card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .card-name {
-    font-weight: 700;
-    font-size: 16.5px;
-    line-height: 1.3;
-  }
+  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card-name { font-weight: 700; font-size: 16.5px; line-height: 1.3; }
 
   .card-src {
     font-family: "IBM Plex Mono", monospace;
@@ -287,18 +393,8 @@
     white-space: nowrap;
   }
 
-  .card-desc {
-    font-size: 14.5px;
-    color: var(--muted);
-    margin: 0;
-  }
-
-  .card-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 2px;
-  }
+  .card-desc { font-size: 14.5px; color: var(--muted); margin: 0; }
+  .card-filters { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
 
   .f {
     font-family: "IBM Plex Mono", monospace;
@@ -310,62 +406,9 @@
     padding: 2px 7px;
   }
 
-  /* ---------- village table ---------- */
-
-  .table-scroll { overflow-x: auto; }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    overflow: hidden;
-    font-size: 15.5px;
-    min-width: 460px;
-  }
-
-  th, td {
-    text-align: start;
-    padding: 11px 15px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  thead th {
-    background: var(--surface-2);
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  tbody tr:last-child td { border-bottom: none; }
-
-  td.code {
-    font-family: "IBM Plex Mono", monospace;
-    font-variant-numeric: tabular-nums;
-    color: var(--muted);
-  }
-
-  td.go a {
-    font-weight: 600;
-    text-decoration: none;
-    border-bottom: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  }
-
-  td.go a:hover { border-bottom-color: var(--accent); }
-
   /* ---------- checklist ---------- */
 
-  .checks {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+  .checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 
   .checks li {
     display: flex;
@@ -374,24 +417,18 @@
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 6px;
-    padding: 13px 15px;
+    padding: 12px 15px;
   }
 
   .checks input {
     accent-color: var(--accent);
-    width: 18px;
-    height: 18px;
+    width: 18px; height: 18px;
     margin: 3px 0 0;
     flex: none;
     cursor: pointer;
   }
 
-  .checks .body {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-  }
+  .checks .body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
   .checks a {
     font-weight: 700;
@@ -401,15 +438,8 @@
   }
 
   .checks a:hover { border-bottom-color: var(--accent); }
-
-  .checks small {
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  .checks li.done .body a,
-  .checks li.done .body small { opacity: .45; }
-
+  .checks small { color: var(--muted); font-size: 14px; }
+  .checks li.done .body a, .checks li.done .body small { opacity: .45; }
   .checks li.done .body a { text-decoration: line-through; }
 
   /* ---------- ad block ---------- */
@@ -458,7 +488,6 @@
   .ad-text {
     margin: 0;
     padding: 20px 22px;
-    font-family: "Assistant", sans-serif;
     font-size: 16px;
     line-height: 1.72;
     white-space: pre-wrap;
@@ -467,33 +496,10 @@
 
   /* ---------- tips ---------- */
 
-  .tips {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .tips li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 14px;
-    align-items: start;
-  }
-
-  .tips .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--sand);
-    margin-top: 11px;
-  }
-
-  .tips b { font-weight: 700; }
-
-  .tips p { margin: 0; color: var(--muted); max-width: 66ch; }
+  .tips { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .tips li { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
+  .tips .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sand); margin-top: 11px; }
+  .tips p { margin: 0; color: var(--muted); max-width: 70ch; }
   .tips p b { color: var(--ink); }
 
   footer {
@@ -501,37 +507,51 @@
     padding-top: 20px;
     font-size: 14px;
     color: var(--muted);
+    max-width: 78ch;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
-  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
 <div class="wrap">
 
   <header class="masthead">
-    <div class="eyebrow">פלמחים · נטעים · בית עובד · בית חנן · כפר הנגיד</div>
+    <div class="eyebrow">פלמחים · נטעים · בית עובד · בית חנן · כפר הנגיד · + ראשל״צ ונס ציונה</div>
     <h1>דירה עם גינה,<br>ועם <em>כלב</em>.</h1>
     <p class="standfirst">
-      כל החיפושים שצריך לעשות כדי למצוא את הדירה הזאת, מסוננים מראש ומסודרים לפי איפה
-      שהיא באמת תופיע. סדר העבודה כאן הוא מלמעלה למטה — הקבוצות קודם, הלוחות אחר כך.
+      תוצאות סריקה בפועל — 35 מודעות שנחלצו מהומלס ומקבוצות פייסבוק, מסודרות לפי אזור
+      ולפי כמה סביר שהן עוד פעילות. אחרי הרשימות: חיפושים חיים, קבוצות לפרסום, ומודעה מוכנה.
     </p>
     <div class="criteria">
-      <div class="chip">2 חדרים <span>1.5–3 בסינון</span></div>
-      <div class="chip">עד 4,000 ₪ <span>לחודש</span></div>
-      <div class="chip">גינה <span>צמוד קרקע</span></div>
+      <div class="chip">2 חדרים <span>1.5–3</span></div>
+      <div class="chip">מושבים: עד 4,000 ₪</div>
+      <div class="chip">ראשל״צ: 3,500–4,000 ₪</div>
+      <div class="chip">גינה / מרפסת</div>
       <div class="chip is-pet">מרשים בעלי חיים <span>תנאי סף</span></div>
     </div>
   </header>
 
+  <div class="tally">
+    <div><b>35</b><small>מודעות שנמצאו</small></div>
+    <div><b>6</b><small>בחמשת המושבים</small></div>
+    <div><b>8</b><small>בראשון לציון</small></div>
+    <div><b>8</b><small>נס ציונה ורחובות</small></div>
+    <div><b>13</b><small>מושבי שפלה נוספים</small></div>
+  </div>
+
   <div class="notice">
-    <h2>לפני שמתחילים — שקיפות על מה שיש כאן ומה אין</h2>
+    <h2>איך הרשימה הזאת נמצאה — ומה המגבלה שלה</h2>
     <p>
-      לא הצלחתי לסרוק בפועל את יד2 ואת פייסבוק: הסביבה שאני רצה בה חוסמת גישה יוצאת
-      לאתרים האלה, ולקבוצות פייסבוק ממילא נדרשת התחברות עם חשבון. אז אין כאן מודעות
-      חיות שנשלפו עבורך. מה שכן — איתרתי את קודי היישוב המדויקים של חמשת המושבים ביד2,
-      ובניתי מהם את החיפושים המסוננים למטה. כל לחיצה פותחת תוצאות עדכניות באמת, ברגע זה.
+      הסביבה שאני רצה בה <b>חוסמת גישה ישירה</b> ליד2, פייסבוק, הומלס, מדלן וקומו, ולקבוצות
+      פייסבוק ממילא נדרשת התחברות. מה שכן עבד: מנוע חיפוש הרשת מאנדקס את דפי המודעה
+      הבודדים של הומלס ואת הפוסטים בקבוצות, אז חיפשתי <b>בניסוח של מודעה</b> ולא בניסוח של
+      שאלה — וכך נשלפו המודעות שלמטה, עם עיר, רחוב, חדרים ומחיר.
+    </p>
+    <p>
+      <b>המגבלה: לא הצלחתי לפתוח אף מודעה כדי לוודא שהיא עדיין פעילה.</b> אין לי תאריכי פרסום.
+      עמודת "טריות" היא הערכה בלבד, לפי מספר הסידורי של המודעה בהומלס — הם עולים בסדר
+      כרונולוגי, והגבוה ביותר שראיתי הוא 737,846. מודעה עם מספר נמוך פורסמה מזמן וסביר
+      שנסגרה. תתייחסי לרשימה כאל <b>רשימת טלפונים לעבור עליה</b>, לא כאל מלאי זמין.
     </p>
   </div>
 
@@ -539,174 +559,13 @@
     <div class="sec-head">
       <div class="sec-title">
         <span class="rank">עדיפות 1</span>
-        <h2 class="h">קבוצות הפייסבוק של המושבים</h2>
+        <h2 class="h">בחמשת המושבים שביקשת</h2>
       </div>
       <p class="sec-note">
-        רוב יחידות הדיור במושבים לא מגיעות ליד2 בכלל — בעל הנחלה מפרסם פוסט בקבוצה
-        המקומית ותוך יומיים זה נסגר. זאת הסיבה שהחלק הזה ראשון, ושפרסום מודעת "מחפשת"
-        משלך שווה כאן יותר מגלילה. סמני מה שכבר פרסמת בו.
-      </p>
-    </div>
-
-    <ul class="checks" id="checks">
-      <li data-key="g1">
-        <input type="checkbox" id="c1">
-        <div class="body">
-          <a href="https://www.facebook.com/groups/dirotbemoshavimdarom/" target="_blank" rel="noopener">דירות במושבים — דרום</a>
-          <small>הקבוצה הכי רלוונטית שמצאתי. עולים בה פוסטים שמזכירים שמית את בית חנן, נטעים, כפר הנגיד ובית עובד.</small>
-        </div>
-      </li>
-      <li data-key="g2">
-        <input type="checkbox" id="c2">
-        <div class="body">
-          <a href="https://www.facebook.com/groups/1414853725269536/" target="_blank" rel="noopener">דירות / בתים להשכרה במושבים בשפלה</a>
-          <small>מכסה את אותה חגורה גאוגרפית, קהל מפרסמים שונה. שווה לפרסם בשתיהן.</small>
-        </div>
-      </li>
-      <li data-key="g3">
-        <input type="checkbox" id="c3">
-        <div class="body">
-          <a href="https://www.facebook.com/search/groups/?q=%D7%A4%D7%9C%D7%9E%D7%97%D7%99%D7%9D" target="_blank" rel="noopener">קבוצות היישוב — פלמחים</a>
-          <small>קיבוץ. השכרות עוברות כמעט תמיד דרך הקבוצה הפנימית או מזכירות הקיבוץ, לא דרך לוח.</small>
-        </div>
-      </li>
-      <li data-key="g4">
-        <input type="checkbox" id="c4">
-        <div class="body">
-          <a href="https://www.facebook.com/search/groups/?q=%D7%A0%D7%98%D7%A2%D7%99%D7%9D%20%D7%9E%D7%95%D7%A9%D7%91" target="_blank" rel="noopener">קבוצות היישוב — נטעים</a>
-          <small>חפשי גם את קבוצת התושבים וגם קבוצת "לוח" אם קיימת.</small>
-        </div>
-      </li>
-      <li data-key="g5">
-        <input type="checkbox" id="c5">
-        <div class="body">
-          <a href="https://www.facebook.com/search/groups/?q=%D7%91%D7%99%D7%AA%20%D7%A2%D7%95%D7%91%D7%93" target="_blank" rel="noopener">קבוצות היישוב — בית עובד</a>
-          <small>מושב קטן; קבוצת התושבים היא בפועל לוח המודעות שלו.</small>
-        </div>
-      </li>
-      <li data-key="g6">
-        <input type="checkbox" id="c6">
-        <div class="body">
-          <a href="https://www.facebook.com/search/groups/?q=%D7%91%D7%99%D7%AA%20%D7%97%D7%A0%D7%9F" target="_blank" rel="noopener">קבוצות היישוב — בית חנן</a>
-          <small>אותו היגיון. בית חנן צמוד לבית עובד, אז מי שמפרסם באחת לרוב פתוח גם לשנייה.</small>
-        </div>
-      </li>
-      <li data-key="g7">
-        <input type="checkbox" id="c7">
-        <div class="body">
-          <a href="https://www.facebook.com/search/groups/?q=%D7%9B%D7%A4%D7%A8%20%D7%94%D7%A0%D7%92%D7%99%D7%93" target="_blank" rel="noopener">קבוצות היישוב — כפר הנגיד</a>
-          <small>היישוב הדרומי בחיפוש שלך, כבר בחגורת גדרה–יבנה.</small>
-        </div>
-      </li>
-    </ul>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <div class="sec-title">
-        <span class="rank">עדיפות 2</span>
-        <h2 class="h">המודעה שלך, מוכנה לפרסום</h2>
-      </div>
-      <p class="sec-note">
-        היתרון הכי גדול שלך מול משכיר שחושש מכלב הוא שאת מאלפת כלבים במקצוע — זה הופך
-        את הכלב שלך מסיכון להמלצה. לכן זה מופיע במשפט השני של המודעה, ולא בסוף.
-      </p>
-    </div>
-
-    <div class="ad">
-      <div class="ad-bar">
-        <strong>נוסח לפרסום בקבוצות</strong>
-        <button class="copy" id="copyBtn" type="button">העתקה</button>
-      </div>
-      <p class="ad-text" id="adText">שלום לכולם 🙂
-מחפשת דירת 2 חדרים / יחידת דיור עם גינה או חצר, להשכרה לטווח ארוך, עד 4,000 ₪ לחודש.
-אני מאלפת כלבים במקצוע, ואיתי כלב מאולף, מחוסן, רגוע ורגיל לחיות בבית — אשמח להכיר אתכם ואותו לפני, וכמובן לקחת אחריות מלאה על הגינה והשטח.
-
-האזורים: פלמחים, נטעים, בית עובד, בית חנן, כפר הנגיד והסביבה הקרובה.
-שוכרת שקטה, עצמאית, ממליצים מהשכירות הקודמת בשמחה.
-כניסה גמישה. מוזמנים לפנות בפרטי, תודה רבה!</p>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <div class="sec-title">
-        <span class="rank">עדיפות 3</span>
-        <h2 class="h">יד2 — חיפושים מסוננים מראש</h2>
-      </div>
-      <p class="sec-note">
-        חמשת היישובים ביחד בכל קישור, עם טווח החדרים והתקרה שלך כבר בפנים. ליד2 אין
-        סינון "מרשה בעלי חיים", אז את זה בודקים בגוף המודעה או בשיחה. שימי לב:
-        ה־URL־ים בנויים לפי מבנה הפרמטרים של יד2 אבל לא הצלחתי לפתוח אותם מכאן כדי
-        לאמת — אם אחד נוחת על חיפוש ריק, זרקי לי הודעה ואתקן.
-      </p>
-    </div>
-
-    <div class="grid">
-      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0597,0174,0202,0159,0582&amp;minRooms=1.5&amp;maxRooms=3&amp;maxPrice=4000">
-        <div class="card-top">
-          <div class="card-name">החיפוש הראשי</div>
-          <div class="card-src">yad2</div>
-        </div>
-        <p class="card-desc">כל חמשת המושבים, כל סוגי הנכס. זה הקישור לפתוח כל בוקר.</p>
-        <div class="card-filters"><span class="f">1.5–3 חד׳</span><span class="f">≤ 4,000 ₪</span><span class="f">5 יישובים</span></div>
-      </a>
-
-      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0597,0174,0202,0159,0582&amp;property=11&amp;maxPrice=4000">
-        <div class="card-top">
-          <div class="card-name">יחידות דיור בלבד</div>
-          <div class="card-src">yad2</div>
-        </div>
-        <p class="card-desc">הקטגוריה שאליה נופלת רוב יחידת ה־2 חדרים עם חצר במושב. בלי הגבלת חדרים, כדי לא לפספס מודעה שלא מילאה את השדה.</p>
-        <div class="card-filters"><span class="f">יחידת דיור</span><span class="f">≤ 4,000 ₪</span></div>
-      </a>
-
-      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0597,0174,0202,0159,0582&amp;property=3,5,11&amp;minRooms=1.5&amp;maxRooms=3&amp;maxPrice=4000">
-        <div class="card-top">
-          <div class="card-name">צמוד קרקע בלבד</div>
-          <div class="card-src">yad2</div>
-        </div>
-        <p class="card-desc">דירות גן, בתים פרטיים ויחידות דיור — שלושת הסוגים שבהם באמת נלווית גינה.</p>
-        <div class="card-filters"><span class="f">גן · פרטי · יחידה</span><span class="f">1.5–3 חד׳</span><span class="f">≤ 4,000 ₪</span></div>
-      </a>
-
-      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;minRooms=1.5&amp;maxRooms=3&amp;maxPrice=4000">
-        <div class="card-top">
-          <div class="card-name">רשת רחבה — כל האזור</div>
-          <div class="card-src">yad2</div>
-        </div>
-        <p class="card-desc">אזור ראשון לציון והסביבה בלי סינון יישוב, כדי לתפוס מושבים שכנים שלא ברשימה — גן שורק, צפריה, גבעת ברנר.</p>
-        <div class="card-filters"><span class="f">אזור 9</span><span class="f">1.5–3 חד׳</span><span class="f">≤ 4,000 ₪</span></div>
-      </a>
-
-      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=41&amp;area=52&amp;minRooms=1.5&amp;maxRooms=3&amp;maxPrice=4000">
-        <div class="card-top">
-          <div class="card-name">חגורת גדרה–יבנה</div>
-          <div class="card-src">yad2</div>
-        </div>
-        <p class="card-desc">כפר הנגיד ובית חנן יושבים על התפר, ומודעות משם לפעמים מסווגות לאזור הזה במקום לאזור 9.</p>
-        <div class="card-filters"><span class="f">אזור 52</span><span class="f">1.5–3 חד׳</span><span class="f">≤ 4,000 ₪</span></div>
-      </a>
-
-      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=41&amp;area=12&amp;minRooms=1.5&amp;maxRooms=3&amp;maxPrice=4000">
-        <div class="card-top">
-          <div class="card-name">נס ציונה–רחובות</div>
-          <div class="card-src">yad2</div>
-        </div>
-        <p class="card-desc">האזור השלישי שגובל בך. פחות מושבי, אבל בתקציב הזה לפעמים צצה שם יחידה עם חצר.</p>
-        <div class="card-filters"><span class="f">אזור 12</span><span class="f">1.5–3 חד׳</span><span class="f">≤ 4,000 ₪</span></div>
-      </a>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <div class="sec-title">
-        <h2 class="h">יישוב־יישוב</h2>
-      </div>
-      <p class="sec-note">
-        אלה קודי היישוב של יד2 שאיתרתי, ומהם נבנו כל הקישורים למעלה. שימושי כשרוצים
-        להסתכל על מושב אחד בלבד, או להרכיב חיפוש משלך.
+        שתי מודעות כאן קולעות כמעט מדויק לבקשה שלך — <b>דירת הגן בכפר הנגיד</b> (2 חדרים,
+        כ־40 מ״ר, עם גינה מטופחת של כ־100 מ״ר, 4,000 ₪) ו<b>יחידת הדיור בנטעים</b>
+        (2 חדרים, 85 מ״ר, 3,800 ₪ כולל ארנונה וּועד מושב). בשתיהן שווה להתקשר גם אם
+        המודעה ישנה — אצל בעל נחלה יחידה מתפנה שוב.
       </p>
     </div>
 
@@ -715,41 +574,248 @@
         <thead>
           <tr>
             <th scope="col">יישוב</th>
-            <th scope="col">קוד יד2</th>
-            <th scope="col">אזור</th>
-            <th scope="col">חיפוש</th>
+            <th scope="col">חד׳</th>
+            <th scope="col">מחיר</th>
+            <th scope="col">פרטים</th>
+            <th scope="col">טריות</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>פלמחים</td>
-            <td class="code">0597</td>
-            <td>ראשל״צ והסביבה</td>
-            <td class="go"><a target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0597&amp;maxPrice=4000">פתיחה ↗</a></td>
+            <td class="where"><span class="star">★</span> כפר הנגיד</td>
+            <td class="rooms">2</td>
+            <td class="price">4,000 ₪</td>
+            <td class="what">דירת גן, כ־40 מ״ר, גינה מטופחת כ־100 מ״ר. דרך מתווך.</td>
+            <td><span class="pill p-mid">לוח תיווך</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/renttivuch/viewad,80635.aspx">מודעה ↗</a></td>
           </tr>
           <tr>
-            <td>נטעים</td>
-            <td class="code">0174</td>
-            <td>ראשל״צ והסביבה</td>
-            <td class="go"><a target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0174&amp;maxPrice=4000">פתיחה ↗</a></td>
+            <td class="where"><span class="star">★</span> נטעים</td>
+            <td class="rooms">2</td>
+            <td class="price">3,800 ₪</td>
+            <td class="what">יחידת דיור, רח׳ השיטה. 85 מ״ר, חלון בכל חדר, מתאים לזוג או ליחיד. המחיר כולל ארנונה וּועד מושב.</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,681736.aspx">מודעה ↗</a></td>
           </tr>
           <tr>
-            <td>בית עובד</td>
-            <td class="code">0202</td>
-            <td>ראשל״צ והסביבה</td>
-            <td class="go"><a target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0202&amp;maxPrice=4000">פתיחה ↗</a></td>
+            <td class="where">נטעים</td>
+            <td class="rooms">2.5</td>
+            <td class="price">—</td>
+            <td class="what">יחידת דיור, רח׳ החיל. גינה ודק, אינטרנט וכבלים, פרקט בכל הבית, מטבח מרווח.</td>
+            <td><span class="pill p-old">ישנה מאוד</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,546924.aspx">מודעה ↗</a></td>
           </tr>
           <tr>
-            <td>בית חנן</td>
-            <td class="code">0159</td>
-            <td>ראשל״צ והסביבה</td>
-            <td class="go"><a target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0159&amp;maxPrice=4000">פתיחה ↗</a></td>
+            <td class="where">פלמחים</td>
+            <td class="rooms">1</td>
+            <td class="price">4,000 ₪</td>
+            <td class="what">דירת סטודיו בקיבוץ, דקות מהחוף. קטנה מדי לבקשה שלך, אבל מלמדת מה טווח המחירים בקיבוץ.</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,693928.aspx">מודעה ↗</a></td>
           </tr>
           <tr>
-            <td>כפר הנגיד</td>
-            <td class="code">0582</td>
-            <td>ראשל״צ והסביבה</td>
-            <td class="go"><a target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0582&amp;maxPrice=4000">פתיחה ↗</a></td>
+            <td class="where">בית חנן</td>
+            <td class="rooms">3</td>
+            <td class="price">—</td>
+            <td class="what">יחידת דיור בגבעת האילנות. גינה, נוף, שקט ופרטיות, 20 ק״מ מתל אביב.</td>
+            <td><span class="pill p-old">ישנה מאוד</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,506529.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">פלמחים</td>
+            <td class="rooms">2</td>
+            <td class="price">—</td>
+            <td class="what">יחידת דיור, נוף המדרון. בחיפוש הופיעה עם הסימון שהעסקה כבר נסגרה.</td>
+            <td><span class="pill p-dead">נסגרה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,574774.aspx">מודעה ↗</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="legend">
+      <span><span class="pill p-fresh">טרייה</span> מספר מודעה 720,000+</span>
+      <span><span class="pill p-mid">בינונית</span> 690,000–720,000</span>
+      <span><span class="pill p-old">ישנה</span> מתחת ל־690,000</span>
+      <span><span class="pill p-dead">נסגרה</span> סומן במפורש</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-title">
+        <span class="rank">עדיפות 2</span>
+        <h2 class="h">ראשון לציון — 3,500 עד 4,000</h2>
+      </div>
+      <p class="sec-note">
+        ארבע המודעות העליונות הן <b>הטריות ביותר בכל הסריקה</b>. נחלת יהודה ושער הים הן
+        השכונות הכי צמודות־קרקע בראשל״צ, ולכן הכי סבירות להגיע עם חצר או מרפסת גדולה —
+        ושתיהן קרובות ליציאה למושבים.
+      </p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">שכונה / רחוב</th>
+            <th scope="col">סוג</th>
+            <th scope="col">חד׳</th>
+            <th scope="col">מחיר</th>
+            <th scope="col">טריות</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="where">הארז</td>
+            <td class="what">יחידת דיור</td>
+            <td class="rooms">2</td>
+            <td class="price">2,950 ₪</td>
+            <td><span class="pill p-fresh">הכי טרייה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,737846.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">שער הים · אחי משגב</td>
+            <td class="what">יחידת דיור</td>
+            <td class="rooms">2</td>
+            <td class="price">3,800 ₪</td>
+            <td><span class="pill p-fresh">טרייה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,736550.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">נחלת יהודה · יעקובוביץ</td>
+            <td class="what">יחידת דיור</td>
+            <td class="rooms">2</td>
+            <td class="price">3,800 ₪</td>
+            <td><span class="pill p-fresh">טרייה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,729875.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">רמת אליהו · תורה ועבודה</td>
+            <td class="what">דירה</td>
+            <td class="rooms">2</td>
+            <td class="price">3,600 ₪</td>
+            <td><span class="pill p-fresh">טרייה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,728417.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">נווה ים · מבצע עובדה</td>
+            <td class="what">יחידת דיור</td>
+            <td class="rooms">2</td>
+            <td class="price">3,900 ₪</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,710462.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">מרכז · הרימון</td>
+            <td class="what">דירה, 70 מ״ר, בניין משופץ, 3 כיווני אוויר</td>
+            <td class="rooms">2</td>
+            <td class="price">3,900 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,686866.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">נחלת יהודה · יפה ירקוני</td>
+            <td class="what">יחידת דיור</td>
+            <td class="rooms">2</td>
+            <td class="price">3,400 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,680670.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">מרכז · ירושלים</td>
+            <td class="what">דירה (4 חדרים — גדולה מהצורך, בתקציב)</td>
+            <td class="rooms">4</td>
+            <td class="price">4,000 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,667702.aspx">מודעה ↗</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-title">
+        <span class="rank">עדיפות 3</span>
+        <h2 class="h">נס ציונה ורחובות</h2>
+      </div>
+      <p class="sec-note">
+        טירת שלום וגבעת ברנר הם החלקים הכי כפריים באזור — גבעת ברנר היא קיבוץ, ויחידה שם
+        כמעט תמיד מגיעה עם שטח פתוח. חלק מהמודעות האלה סומנו בחיפוש כעסקאות שנסגרו.
+      </p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">יישוב · רחוב</th>
+            <th scope="col">חד׳</th>
+            <th scope="col">מחיר</th>
+            <th scope="col">טריות</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="where">רחובות החדשה · עומר</td>
+            <td class="rooms">2</td>
+            <td class="price">4,000 ₪</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,712201.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">גבעת ברנר · האלה 17</td>
+            <td class="rooms">2</td>
+            <td class="price">3,900 ₪</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,705275.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">טירת שלום, נס ציונה · סנונית</td>
+            <td class="rooms">2</td>
+            <td class="price">3,500 ₪</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,693562.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">רחובות ההולנדית · הר הצופים</td>
+            <td class="rooms">2</td>
+            <td class="price">3,200 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,687148.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">קרית עקרון · הצנחנים</td>
+            <td class="rooms">2</td>
+            <td class="price">3,000 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,686226.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">קרית דוד, רחובות · נתיב הל״ה</td>
+            <td class="rooms">2.5</td>
+            <td class="price">3,700 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,685419.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">גבעת ברנר · הדקל</td>
+            <td class="rooms">2</td>
+            <td class="price">3,800 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,681612.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">ותיקים, נס ציונה · החלוץ</td>
+            <td class="rooms">2</td>
+            <td class="price">3,000 ₪</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,680940.aspx">מודעה ↗</a></td>
           </tr>
         </tbody>
       </table>
@@ -760,40 +826,335 @@
     <div class="sec-head">
       <div class="sec-title">
         <span class="rank">עדיפות 4</span>
-        <h2 class="h">לוחות נוספים</h2>
+        <h2 class="h">מושבי שפלה נוספים — הרחבת הרדיוס</h2>
       </div>
       <p class="sec-note">
-        פחות תנועה מיד2, אבל מודעות שונות — ולהומלס יש סינון "מרשה בעלי חיים" שאין ליד2.
+        לא ביקשת אותם, אבל אלה מושבים באותה חגורה ובאותו מחיר, וכמה מהם <b>מציינים גינה
+        במפורש</b> — מה שנדיר בשאר הרשימה. אם החמישה שלך יתייבשו, כאן ההמשך הטבעי.
+      </p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">מושב · רחוב</th>
+            <th scope="col">חד׳</th>
+            <th scope="col">מחיר</th>
+            <th scope="col">פרטים</th>
+            <th scope="col">טריות</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="where">בית אלעזרי · התמר</td>
+            <td class="rooms">2</td>
+            <td class="price">3,000 ₪</td>
+            <td class="what">עם חצר</td>
+            <td><span class="pill p-fresh">טרייה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,717755.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">משמר השבעה · קורדובה</td>
+            <td class="rooms">2</td>
+            <td class="price">3,850 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-fresh">טרייה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,716563.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">פתחיה · התמר</td>
+            <td class="rooms">2</td>
+            <td class="price">2,750 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,713473.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where"><span class="star">★</span> נחלים · ירדן</td>
+            <td class="rooms">2</td>
+            <td class="price">3,200 ₪</td>
+            <td class="what">משופצת, קומת קרקע, <b>יציאה לגינה גדולה</b>, חניה בשפע. המחיר כולל ארנונה ומים.</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,698688.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">עזריקם · הדקל</td>
+            <td class="rooms">2</td>
+            <td class="price">2,900 ₪</td>
+            <td class="what">שכונת גבעת הדקלים</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,692690.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">רינתיה · הרותם</td>
+            <td class="rooms">2</td>
+            <td class="price">4,000 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-mid">בינונית</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,689242.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">גבעת כ״ח · הירדן</td>
+            <td class="rooms">2</td>
+            <td class="price">3,500 ₪</td>
+            <td class="what">בהרחבה</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,688470.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">תלמי מנשה, באר יעקב · הזית</td>
+            <td class="rooms">2</td>
+            <td class="price">3,400 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,687412.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">כפר הרי״ף · השקד</td>
+            <td class="rooms">2</td>
+            <td class="price">3,000 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,682222.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where"><span class="star">★</span> ינון · ראשונים 1</td>
+            <td class="rooms">2</td>
+            <td class="price">2,500 ₪</td>
+            <td class="what"><b>גינה גדולה עם עצי פרי</b>, כניסה פרטית</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,681224.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">אחיסמך · הזית</td>
+            <td class="rooms">2</td>
+            <td class="price">3,000 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,679894.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">צלפון · הדקל</td>
+            <td class="rooms">2</td>
+            <td class="price">3,500 ₪</td>
+            <td class="what">—</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/viewad,679010.aspx">מודעה ↗</a></td>
+          </tr>
+          <tr>
+            <td class="where">בן זכאי · האורן</td>
+            <td class="rooms">1.5</td>
+            <td class="price">2,650 ₪</td>
+            <td class="what">צמוד ליבנה</td>
+            <td><span class="pill p-old">ישנה</span></td>
+            <td class="go"><a target="_blank" rel="noopener" href="https://m.homeless.co.il/rent/viewad,681146.aspx">מודעה ↗</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-title">
+        <h2 class="h">חיפושים חיים</h2>
+      </div>
+      <p class="sec-note">
+        הרשימות למעלה הן תמונת מצב מהסריקה. אלה הקישורים לתוצאות עדכניות ברגע שאת פותחת
+        אותם — כולל דפי היישוב בהומלס, שהם המקור שממנו הגיעו רוב המודעות.
       </p>
     </div>
 
     <div class="grid">
-      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/?city=%D7%A4%D7%9C%D7%9E%D7%97%D7%99%D7%9D">
-        <div class="card-top">
-          <div class="card-name">הומלס</div>
-          <div class="card-src">homeless</div>
-        </div>
-        <p class="card-desc">חפשי יישוב אחד בכל פעם, וסמני בטופס את "מרשה בעלי חיים" — זה הלוח היחיד עם הסינון הזה.</p>
-        <div class="card-filters"><span class="f">יש סינון בע״ח</span></div>
+      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/city=%D7%A0%D7%98%D7%A2%D7%99%D7%9D">
+        <div class="card-top"><div class="card-name">נטעים</div><div class="card-src">homeless</div></div>
+        <p class="card-desc">כל ההשכרות במושב. בטופס יש סינון "מרשה בעלי חיים" שאין ביד2.</p>
+        <div class="card-filters"><span class="f">סינון בע״ח</span></div>
       </a>
 
-      <a class="card" target="_blank" rel="noopener" href="https://www.komo.co.il/">
-        <div class="card-top">
-          <div class="card-name">קומו</div>
-          <div class="card-src">komo</div>
-        </div>
-        <p class="card-desc">לוח מתווכים ופרטיים. מעט מודעות מושבים, אבל לפעמים בלעדיות.</p>
-        <div class="card-filters"><span class="f">השכרה</span></div>
+      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/city=%D7%91%D7%99%D7%AA%20%D7%A2%D7%95%D7%91%D7%93">
+        <div class="card-top"><div class="card-name">בית עובד</div><div class="card-src">homeless</div></div>
+        <p class="card-desc">היישוב היחיד מהחמישה שלא החזיר אף מודעה בסריקה — שווה מעקב יומי.</p>
+        <div class="card-filters"><span class="f">0 בסריקה</span></div>
       </a>
 
-      <a class="card" target="_blank" rel="noopener" href="https://www.ad.co.il/nadlanrent?sp275=17629&amp;sp276=18480">
-        <div class="card-top">
-          <div class="card-name">אגורה (ad.co.il)</div>
-          <div class="card-src">ad.co.il</div>
-        </div>
-        <p class="card-desc">מקטע "מושבים במרכז" מכיל את בית חנן והסביבה. לוח ותיק, קהל מבוגר יותר, ולכן מודעות שלא חוזרות ביד2.</p>
+      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/city=%D7%A7%D7%99%D7%91%D7%95%D7%A5%20%D7%A4%D7%9C%D7%9E%D7%97%D7%99%D7%9D$$iNumber3=9">
+        <div class="card-top"><div class="card-name">קיבוץ פלמחים</div><div class="card-src">homeless</div></div>
+        <p class="card-desc">יחידות דיור בלבד. שימי לב שבהומלס פלמחים רשום כ"קיבוץ פלמחים", לא "פלמחים".</p>
+        <div class="card-filters"><span class="f">יחידות דיור</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/city=%D7%9B%D7%A4%D7%A8%20%D7%94%D7%A0%D7%92%D7%99%D7%93$$iNumber3=7">
+        <div class="card-top"><div class="card-name">כפר הנגיד</div><div class="card-src">homeless</div></div>
+        <p class="card-desc">בתים פרטיים. כאן ישבה דירת הגן עם 100 מ״ר גינה.</p>
+        <div class="card-filters"><span class="f">בתים פרטיים</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/inumber1=10">
+        <div class="card-top"><div class="card-name">כל מושבי המרכז</div><div class="card-src">homeless</div></div>
+        <p class="card-desc">האזור שאליו משויכים נטעים, בית עובד ובית חנן. הרשת הרחבה של הומלס.</p>
         <div class="card-filters"><span class="f">מושבים במרכז</span></div>
       </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.homeless.co.il/rent/inumber1=168">
+        <div class="card-top"><div class="card-name">ראשון לציון</div><div class="card-src">homeless</div></div>
+        <p class="card-desc">כל ההשכרות בעיר. סנני 2 חדרים ו־3,500–4,000 בטופס.</p>
+        <div class="card-filters"><span class="f">כל העיר</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0597,0174,0202,0159,0582&amp;minRooms=1.5&amp;maxRooms=3&amp;maxPrice=4000">
+        <div class="card-top"><div class="card-name">חמשת המושבים</div><div class="card-src">yad2</div></div>
+        <p class="card-desc">כל היישובים שלך בקישור אחד, מסונן לחדרים ולתקציב. זה הקישור לפתוח כל בוקר.</p>
+        <div class="card-filters"><span class="f">1.5–3 חד׳</span><span class="f">≤ 4,000 ₪</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=0597,0174,0202,0159,0582&amp;property=3,5,11&amp;maxPrice=4000">
+        <div class="card-top"><div class="card-name">צמוד קרקע בלבד</div><div class="card-src">yad2</div></div>
+        <p class="card-desc">דירות גן, בתים פרטיים ויחידות דיור — שלושת הסוגים שבהם נלווית גינה.</p>
+        <div class="card-filters"><span class="f">גן · פרטי · יחידה</span><span class="f">≤ 4,000 ₪</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=2&amp;area=9&amp;city=8300&amp;minRooms=2&amp;maxRooms=3&amp;minPrice=3500&amp;maxPrice=4000&amp;property=3,11">
+        <div class="card-top"><div class="card-name">ראשל״צ · דירות גן</div><div class="card-src">yad2</div></div>
+        <p class="card-desc">בדיוק הטווח שביקשת, מוגבל לדירות גן ויחידות דיור כדי לקבל חצר.</p>
+        <div class="card-filters"><span class="f">3,500–4,000 ₪</span><span class="f">גן · יחידה</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent?topArea=41&amp;area=12&amp;city=7200&amp;minRooms=2&amp;maxRooms=3&amp;maxPrice=4000">
+        <div class="card-top"><div class="card-name">נס ציונה</div><div class="card-src">yad2</div></div>
+        <p class="card-desc">העיר במלואה. טירת שלום היא השכונה הכי צמודת־קרקע בה.</p>
+        <div class="card-filters"><span class="f">2–3 חד׳</span><span class="f">≤ 4,000 ₪</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.yad2.co.il/realestate/rent/south?area=99&amp;property=11&amp;maxPrice=4000">
+        <div class="card-top"><div class="card-name">כל מושבי השפלה</div><div class="card-src">yad2</div></div>
+        <p class="card-desc">יחידות דיור בכל אזור השפלה — משם הגיעו רוב המודעות בטבלה הרביעית.</p>
+        <div class="card-filters"><span class="f">אזור 99</span><span class="f">יחידות דיור</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.komo.co.il/code/nadlan/apartments-for-rent.asp?nehes=12&amp;cityName=%D7%9B%D7%A4%D7%A8+%D7%94%D7%A0%D7%92%D7%99%D7%93&amp;privateOnly=1">
+        <div class="card-top"><div class="card-name">קומו · ללא תיווך</div><div class="card-src">komo</div></div>
+        <p class="card-desc">יחידות דיור מבעלי נכס בלבד. החליפי את שם היישוב בכתובת כדי לעבור בין המושבים.</p>
+        <div class="card-filters"><span class="f">ללא תיווך</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.ad.co.il/nadlanrent?sp275=17629&amp;sp276=22863">
+        <div class="card-top"><div class="card-name">אגורה · נטעים</div><div class="card-src">ad.co.il</div></div>
+        <p class="card-desc">לוח ותיק עם קהל מפרסמים מבוגר יותר, ולכן מודעות שלא חוזרות ביד2.</p>
+        <div class="card-filters"><span class="f">נטעים</span></div>
+      </a>
+
+      <a class="card" target="_blank" rel="noopener" href="https://www.homee.co.il/%D7%A4%D7%9C%D7%9E%D7%97%D7%99%D7%9D/%D7%A0%D7%9B%D7%A1%D7%99%D7%9D/">
+        <div class="card-top"><div class="card-name">אתר הבית · פלמחים</div><div class="card-src">homee</div></div>
+        <p class="card-desc">אתר שמתמחה במושבים וקיבוצים. יש לו דף נפרד לכל אחד מהיישובים שלך.</p>
+        <div class="card-filters"><span class="f">מושבים</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-title">
+        <h2 class="h">קבוצות לפרסום</h2>
+      </div>
+      <p class="sec-note">
+        רוב יחידות הדיור במושבים לא מגיעות לאף לוח — בעל הנחלה מפרסם בקבוצה המקומית וזה
+        נסגר תוך יומיים. לכן פרסום מודעת "מחפשת" משלך שווה כאן יותר מגלילה. סמני מה שכבר פרסמת בו.
+      </p>
+    </div>
+
+    <ul class="checks" id="checks">
+      <li data-key="g1">
+        <input type="checkbox" id="c1">
+        <div class="body">
+          <a href="https://www.facebook.com/groups/dirotbemoshavimdarom/" target="_blank" rel="noopener">דירות במושבים — דרום</a>
+          <small>הקבוצה הכי רלוונטית. ראיתי בה פוסטים שמזכירים שמית את בית חנן, נטעים, כפר הנגיד ובית עובד.</small>
+        </div>
+      </li>
+      <li data-key="g2">
+        <input type="checkbox" id="c2">
+        <div class="body">
+          <a href="https://www.facebook.com/groups/1414853725269536/" target="_blank" rel="noopener">דירות / בתים להשכרה במושבים בשפלה</a>
+          <small>אותה חגורה, קהל אחר. בה מצאתי פוסט של מישהי שחיפשה בדיוק ביישובי מועצת גן רווה.</small>
+        </div>
+      </li>
+      <li data-key="g3">
+        <input type="checkbox" id="c3">
+        <div class="body">
+          <a href="https://www.facebook.com/groups/1472569969685762/" target="_blank" rel="noopener">דירות בשושו — ראשל״צ, נס ציונה, רחובות</a>
+          <small>אין כניסה למתווכים. מכסה בדיוק את שלוש הערים שהוספת.</small>
+        </div>
+      </li>
+      <li data-key="g4">
+        <input type="checkbox" id="c4">
+        <div class="body">
+          <a href="https://www.facebook.com/groups/203514853167232/" target="_blank" rel="noopener">נדל״ן באזור נס ציונה — ראשון לציון</a>
+          <small>קבוצה אזורית שמחברת בין שתי הערים.</small>
+        </div>
+      </li>
+      <li data-key="g5">
+        <input type="checkbox" id="c5">
+        <div class="body">
+          <a href="https://www.facebook.com/groups/959597644173111/" target="_blank" rel="noopener">דירות להשכרה ללא תיווך — ראשון לציון</a>
+          <small>בעלי נכס בלבד, בלי דמי תיווך.</small>
+        </div>
+      </li>
+      <li data-key="g6">
+        <input type="checkbox" id="c6">
+        <div class="body">
+          <a href="https://www.facebook.com/groups/244638046780791/" target="_blank" rel="noopener">דירות להשכרה ללא תיווך בנס ציונה</a>
+          <small>המקבילה של הקודמת לנס ציונה.</small>
+        </div>
+      </li>
+      <li data-key="g7">
+        <input type="checkbox" id="c7">
+        <div class="body">
+          <a href="https://www.facebook.com/search/groups/?q=%D7%A4%D7%9C%D7%9E%D7%97%D7%99%D7%9D" target="_blank" rel="noopener">קבוצות היישוב — פלמחים</a>
+          <small>קיבוץ. השכרות עוברות דרך הקבוצה הפנימית או מזכירות הקיבוץ, לא דרך לוח.</small>
+        </div>
+      </li>
+      <li data-key="g8">
+        <input type="checkbox" id="c8">
+        <div class="body">
+          <a href="https://www.facebook.com/search/groups/?q=%D7%91%D7%99%D7%AA%20%D7%A2%D7%95%D7%91%D7%93" target="_blank" rel="noopener">קבוצות היישוב — בית עובד</a>
+          <small>מושב קטן, וכאמור זה שהחזיר אפס מודעות בכל הסריקה. הקבוצה היא בפועל לוח המודעות שלו.</small>
+        </div>
+      </li>
+      <li data-key="g9">
+        <input type="checkbox" id="c9">
+        <div class="body">
+          <a href="https://www.facebook.com/search/groups/?q=%D7%91%D7%99%D7%AA%20%D7%97%D7%A0%D7%9F" target="_blank" rel="noopener">קבוצות היישוב — בית חנן</a>
+          <small>צמוד לבית עובד; מי שמפרסם באחד לרוב פתוח גם לשני.</small>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-title">
+        <h2 class="h">המודעה שלך, מוכנה לפרסום</h2>
+      </div>
+      <p class="sec-note">
+        היתרון הכי גדול שלך מול משכיר שחושש מכלב הוא שאת מאלפת כלבים במקצוע — זה הופך את
+        הכלב שלך מסיכון להמלצה. לכן זה במשפט השני, ולא בסוף.
+      </p>
+    </div>
+
+    <div class="ad">
+      <div class="ad-bar">
+        <strong>נוסח לפרסום בקבוצות</strong>
+        <button class="copy" id="copyBtn" type="button">העתקה</button>
+      </div>
+      <p class="ad-text" id="adText">שלום לכולם 🙂
+מחפשת דירת 2 חדרים / יחידת דיור עם גינה או חצר, להשכרה לטווח ארוך, עד 4,000 ₪ לחודש.
+אני מאלפת כלבים במקצוע, ואיתי כלב מאולף, מחוסן, רגוע ורגיל לחיות בבית — אשמח שתכירו אותו לפני, וכמובן לקחת אחריות מלאה על הגינה והשטח.
+
+האזורים: נטעים, פלמחים, בית עובד, בית חנן, כפר הנגיד, ואזור נס ציונה. גם ראשון לציון עם מרפסת או חצר רלוונטי.
+שוכרת שקטה, עצמאית, ממליצים מהשכירות הקודמת בשמחה.
+כניסה גמישה. מוזמנים לפנות בפרטי, תודה רבה!</p>
     </div>
   </section>
 
@@ -807,31 +1168,32 @@
     <ul class="tips">
       <li>
         <div class="dot"></div>
-        <p><b>הפעילי התראות ביד2, אל תגללי.</b> בכל אחד מהחיפושים למעלה יש כפתור שמירת חיפוש. בשוק כזה דירה עם גינה ב־4,000 ₪ נסגרת ביום, ולהיות ראשונה שווה יותר מלראות הכול.</p>
+        <p><b>התחילי מהשתיים המסומנות בכוכב.</b> דירת הגן בכפר הנגיד ויחידת הדיור בנטעים הן היחידות בכל הסריקה שעונות על שלושת התנאים — 2 חדרים, גינה, ובתקציב. גם אם המודעות ישנות, שיחה לבעל הנחלה שווה: אצלם יחידה מתפנה שוב ושוב.</p>
       </li>
       <li>
         <div class="dot"></div>
-        <p><b>אל תשאלי "מרשים כלב?" בהודעה הראשונה.</b> זו שאלה שקל לענות עליה "לא" בלי לחשוב. תארי את הכלב ואת המקצוע שלך — ותני להם להגיד כן לכלב ספציפי, לא לרעיון מופשט.</p>
+        <p><b>בית עובד דורש טיפול אחר.</b> הוא היישוב היחיד מהחמישה שלא החזיר אף מודעה — בשום לוח. זה לא אומר שאין שם השכרות, אלא שהן לא מגיעות לאינטרנט בכלל. שם הקבוצה המקומית ומודעה על לוח המכולת הם הערוץ היחיד.</p>
       </li>
       <li>
         <div class="dot"></div>
-        <p><b>הציעי להביא את הכלב לביקור.</b> ההצעה הזאת לבדה משדרת ביטחון, וברוב המקרים הופכת את השיחה. במושב, שבו החצר גדולה והשכנים מכירים, זה עובד אפילו טוב יותר.</p>
+        <p><b>הפעילי התראות, אל תגללי.</b> ביד2 ובהומלס יש שמירת חיפוש. דירה עם גינה ב־4,000 ₪ נסגרת ביום, ולהיות ראשונה שווה יותר מלראות הכול.</p>
       </li>
       <li>
         <div class="dot"></div>
-        <p><b>פרסמי מודעת "מחפשת" ורענני אותה שבועית.</b> במושבים חלק ניכר מההשכרות לא מפורסם בכלל — בעל נחלה רואה פוסט של מחפשת ומחליט להשכיר את היחידה שעמדה ריקה. מודעה פעילה עדיפה על סריקה פסיבית.</p>
+        <p><b>אל תשאלי "מרשים כלב?" בהודעה הראשונה.</b> זו שאלה שקל לענות עליה "לא" בלי לחשוב. תארי את הכלב ואת המקצוע שלך, והציעי להביא אותו לביקור — ותני להם להגיד כן לכלב ספציפי, לא לרעיון מופשט.</p>
       </li>
       <li>
         <div class="dot"></div>
-        <p><b>הרחיבי בשקט את הרדיוס.</b> גן שורק, צפריה, כפר הנגיד, בני דרום ובית אלעזרי הם באותה חגורה ובאותו מחיר. הקישור "רשת רחבה" למעלה עושה בדיוק את זה.</p>
+        <p><b>בראשל״צ, כווני לנחלת יהודה ולשער הים.</b> אלה השכונות הצמודות־קרקע של העיר, ולכן שם הסיכוי לחצר או למרפסת גדולה בתקציב שלך הוא הגבוה ביותר — ושתיהן קרובות ליציאה למושבים.</p>
       </li>
     </ul>
   </section>
 
   <footer>
-    נבנה עבור חיפוש דירה בפלמחים, נטעים, בית עובד, בית חנן וכפר הנגיד. קודי היישוב אומתו מול
-    דפי יד2 הפומביים; המודעות עצמן לא נסרקו — הסביבה חוסמת גישה יוצאת ליד2 ולפייסבוק.
-    הסימונים בצ׳קליסט נשמרים בדפדפן שלך בלבד.
+    35 מודעות שנאספו מהומלס, מקבוצות פייסבוק ומלוחות משניים דרך חיפוש רשת, באוגוסט 2026.
+    לא ניתן היה לפתוח את המודעות עצמן כדי לאמת זמינות או תאריך פרסום — הסביבה חוסמת גישה
+    ישירה ליד2, פייסבוק, הומלס, מדלן וקומו. דירוג הטריות הוא הסקה ממספרי המודעות בהומלס,
+    לא נתון מאומת. הסימונים בצ׳קליסט נשמרים בדפדפן שלך בלבד.
   </footer>
 
 </div>
