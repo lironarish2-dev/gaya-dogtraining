@@ -39,3 +39,17 @@ python3 measure.py /work/out/episode.webm
 
 `offMean` שלילי קבוע הוא תקין: החיתוך נוחת מעט לפני שהדוברת מתחילה,
 בכוונה. מה שחשוב הוא `offStd` ו-`drift`.
+
+## בדיקות רגרסיה
+
+```bash
+node test-mp4pack.js                    # אורז ה-MP4 — הנתיב של הלקוחה
+node test-audio.js ../index.html /work/fx44    # מיקרופון 44.1kHz
+node test-audio.js ../index.html /work/fxmp3   # מיקרופון דחוס
+node test-failure.js                    # כשל באמצע: דיווח + קובץ חלקי
+```
+
+`test-mp4pack` חשובה במיוחד: לכרום בסביבה הזאת אין H.264 כלל — לא
+קידוד ולא פענוח — ולכן שום בדיקה מקצה-לקצה לא נוגעת בפורמט שהלקוחה
+מקבלת בפועל. הבדיקה מזרימה דגימות H.264 אמיתיות עם B-frames דרך
+פונקציות האריזה של הדף עצמו ומשווה מול pyav.

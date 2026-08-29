@@ -4032,7 +4032,18 @@ async function fastRender(){
             durationMs:totalSpan*1000, opusHead: makeOpusHead(1,48000) })]));
           headerDone = true;
         }
-        const lastTsW = videoChunks.length ? videoChunks[videoChunks.length-1].timestamp/1e6 : 0;
+        /* לבנות מחדש את הכותרת עם אורך אחר — לקובץ חלקי אחרי כשל */
+      _reheader = sec => {
+        try{
+          if(MP4 && avcC) return new Blob([mp4Head({ width:W, height:H, vTimescale:VT,
+            aTimescale:AT, channels:1, durationMs: sec*1000 + vShift/VT*1000,
+            avcC, asc: asc || new Uint8Array([0x11,0x90]) })]);
+          if(!MP4) return new Blob([webmOpen({ width:W, height:H, durationMs: sec*1000,
+            opusHead: makeOpusHead(1,48000) })]);
+        }catch(e){}
+        return null;
+      };
+      const lastTsW = videoChunks.length ? videoChunks[videoChunks.length-1].timestamp/1e6 : 0;
         const upToW = final ? Infinity : lastTsW - 2;
         if(!final && upToW <= flushedTo + 2) return;
         const blocks = [];
@@ -4465,7 +4476,11 @@ async function fastRender(){
       try{
         if(_partsRef && _partsRef.length > 1){
           const got = _doneRef.sec || 0;
-          const pblob = new Blob(_partsRef, {type: _extRef === 'mp4' ? 'video/mp4' : 'video/webm'});
+          /* הכותרת שנכתבה בהתחלה מצהירה על אורך הפרק המלא. בקובץ
+             חלקי זה שקר: הנגן יראה ציר זמן ארוך עם מעט תוכן. */
+          const hdr = _reheader && got > 0 ? _reheader(got) : null;
+          const parts = hdr ? [hdr, ..._partsRef.slice(1)] : _partsRef;
+          const pblob = new Blob(parts, {type: _extRef === 'mp4' ? 'video/mp4' : 'video/webm'});
           if(pblob.size > 200000){
             const extra = document.createElement('div');
             extra.style.cssText = 'margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(0,0,0,.15)';
@@ -4838,7 +4853,7 @@ function rangeReady(){
    את השינה, והאירוע מחזיר אותה אחרי כל חזרה מרקע. */
 let _wakeLock = null, _trialDone = null, _autoSlow = false;
 /* מה שכבר נארז ונכתב, כדי שכשל באמצע לא ימחק שעה של עבודה */
-let _partsRef = null, _doneRef = null, _extRef = null;
+let _partsRef = null, _doneRef = null, _extRef = null, _reheader = null;
 async function keepAwake(on){
   try{
     if(on){
