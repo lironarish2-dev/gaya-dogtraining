@@ -178,7 +178,7 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 65</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 66</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -3378,7 +3378,14 @@ function ebmlEl(id, payload){
   const head = [ebmlId(id), ebmlVint(size)];
   const out = new Uint8Array(head[0].byteLength + head[1].byteLength + size);
   let o=0;
-  for(const p of [...head, ...parts]){ out.set(new Uint8Array(p.buffer||p), o); o+=p.byteLength; }
+  /* תצוגה על חוצץ עם היסט: new Uint8Array(p.buffer) מעתיק את החוצץ
+     כולו, לא את התצוגה. כאן זה עוד לא קרה, אבל זו טעות שמשחיתה
+     קובץ בשקט ברגע שמישהו יעביר תצוגה חלקית. */
+  for(const p of [...head, ...parts]){
+    out.set(ArrayBuffer.isView(p) ? new Uint8Array(p.buffer, p.byteOffset, p.byteLength)
+                                  : new Uint8Array(p), o);
+    o += p.byteLength;
+  }
   return out;
 }
 const ebmlStr = t => new TextEncoder().encode(t);
@@ -3435,6 +3442,69 @@ function buildWebm({width, height, durationMs, videoChunks, audioChunks, opusHea
   if(cluster) clusters.push(ebmlEl(0x1F43B675, cluster));
   const segment = ebmlEl(0x18538067, [info, tracks, ...clusters]);
   return new Blob([header, segment], {type:'video/webm'});
+}
+/* פתיחת קובץ WebM זורם: כותרת, Segment באורך *לא ידוע*, ואז מידע
+   ורצועות. אורך לא ידוע הוא מה ש-MediaRecorder עצמו מפיק, וכל נגן
+   יודע לקרוא אותו — וזה מה שמאפשר להוסיף אשכולות תוך כדי במקום
+   להחזיק את כל הפרק בזיכרון עד הסוף. */
+function webmOpen({width, height, durationMs, opusHead}){
+  const header = ebmlEl(0x1A45DFA3, [
+    ebmlEl(0x4286, ebmlNum(1)), ebmlEl(0x42F7, ebmlNum(1)),
+    ebmlEl(0x42F2, ebmlNum(4)), ebmlEl(0x42F3, ebmlNum(8)),
+    ebmlEl(0x4282, ebmlStr('webm')), ebmlEl(0x4287, ebmlNum(2)), ebmlEl(0x4285, ebmlNum(2)),
+  ]);
+  const info = ebmlEl(0x1549A966, [
+    ebmlEl(0x2AD7B1, ebmlNum(1000000)),
+    ebmlEl(0x4489, ebmlFloat(durationMs)),
+    ebmlEl(0x4D80, ebmlStr('podcast-router')), ebmlEl(0x5741, ebmlStr('podcast-router')),
+  ]);
+  const tracks = ebmlEl(0x1654AE6B, [
+    ebmlEl(0xAE, [
+      ebmlEl(0xD7, ebmlNum(1)), ebmlEl(0x73C5, ebmlNum(1)), ebmlEl(0x83, ebmlNum(1)),
+      ebmlEl(0x86, ebmlStr('V_VP8')),
+      ebmlEl(0xE0, [ebmlEl(0xB0, ebmlNum(width,2)), ebmlEl(0xBA, ebmlNum(height,2))]),
+    ]),
+    ebmlEl(0xAE, [
+      ebmlEl(0xD7, ebmlNum(2)), ebmlEl(0x73C5, ebmlNum(2)), ebmlEl(0x83, ebmlNum(2)),
+      ebmlEl(0x86, ebmlStr('A_OPUS')),
+      ebmlEl(0x63A2, opusHead),
+      ebmlEl(0x56AA, ebmlNum(6500000, 4)),
+      ebmlEl(0x56BB, ebmlNum(80000000, 4)),
+      ebmlEl(0xE1, [ebmlEl(0xB5, ebmlFloat(48000)), ebmlEl(0x9F, ebmlNum(1))]),
+    ]),
+  ]);
+  const segId = ebmlId(0x18538067);
+  const unknownLen = new Uint8Array([0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]);
+  const n = header.byteLength + segId.byteLength + 8 + info.byteLength + tracks.byteLength;
+  const out = new Uint8Array(n); let o = 0;
+  for(const p of [header, segId, unknownLen, info, tracks]){ out.set(p, o); o += p.byteLength; }
+  return out;
+}
+/* אשכול אחד או יותר מתוך אצווה של בלוקים ממוינת לפי זמן.
+   הזמן היחסי בתוך אשכול הוא מספר מסומן ב-16 סיביות, ולכן אשכול
+   חדש כל שתי שניות — הרבה בתוך הטווח. */
+function webmClusters(blocks){
+  const parts = [];
+  let cluster = null, clusterTc = 0;
+  for(const b of blocks){
+    if(!cluster || b.tc - clusterTc > 2000){
+      if(cluster) parts.push(ebmlEl(0x1F43B675, cluster));
+      clusterTc = b.tc;
+      cluster = [ebmlEl(0xE7, ebmlNum(clusterTc, 4))];
+    }
+    const rel = b.tc - clusterTc;
+    const sb = new Uint8Array(4 + b.data.byteLength);
+    sb[0] = 0x80 | b.track;
+    sb[1] = (rel>>8)&255; sb[2] = rel&255;
+    sb[3] = b.key ? 0x80 : 0;
+    sb.set(b.data, 4);
+    cluster.push(ebmlEl(0xA3, sb));
+  }
+  if(cluster) parts.push(ebmlEl(0x1F43B675, cluster));
+  let n = 0; for(const p of parts) n += p.byteLength;
+  const out = new Uint8Array(n); let o = 0;
+  for(const p of parts){ out.set(p, o); o += p.byteLength; }
+  return out;
 }
 function makeOpusHead(channels, sampleRate){
   const b = new Uint8Array(19);
@@ -3904,7 +3974,33 @@ async function fastRender(){
        משאירים תמיד שתי שניות אחרונות לא ארוזות, כדי לא לחתוך קטע
        באמצע בזמן שהמקודד עוד עשוי לפלוט אליו. */
     const flushParts = (final)=>{
-      if(!MP4 || !avcC) return;            // WebM נארז בסוף כרגיל
+      if(!MP4){
+        /* WebM זורם: אשכול נכתב כ-Blob ומשוחרר מהזיכרון, בדיוק כמו
+           קטעי ה-MP4. קודם הכל נצבר עד הסוף — כמה ג'יגה בערמה של
+           הדפדפן — והלשונית נחנקה ברגע האריזה, אחרי כל העבודה. */
+        if(!headerDone){
+          fileParts.push(new Blob([webmOpen({ width:W, height:H,
+            durationMs:(b-a)*1000, opusHead: makeOpusHead(1,48000) })]));
+          headerDone = true;
+        }
+        const lastTsW = videoChunks.length ? videoChunks[videoChunks.length-1].timestamp/1e6 : 0;
+        const upToW = final ? Infinity : lastTsW - 2;
+        if(!final && upToW <= flushedTo + 2) return;
+        const blocks = [];
+        while(videoChunks.length && videoChunks[0].timestamp/1e6 < upToW){
+          const c = videoChunks.shift();
+          blocks.push({ tc: Math.round(c.timestamp/1000), track:1, key:c.type==='key', data:c.data });
+        }
+        while(audioChunks.length && audioChunks[0].timestamp/1e6 < upToW){
+          const c = audioChunks.shift();
+          blocks.push({ tc: Math.round(c.timestamp/1000), track:2, key:true, data:c.data });
+        }
+        blocks.sort((x,y)=>x.tc-y.tc || x.track-y.track);
+        if(blocks.length) fileParts.push(new Blob([webmClusters(blocks)]));
+        flushedTo = isFinite(upToW) ? upToW : flushedTo;
+        return;
+      }
+      if(!avcC) return;
       /* אריזה מצטברת בטוחה רק כשהמקודד פולט לפי סדר התצוגה. פלט לא
          מסודר (B-frames) מפזר חותמות בין הקבוצות ושובר את הקובץ
          מאמצעו — במקרה כזה אורזים הכול פעם אחת בסוף, עם מיון גלובלי. */
@@ -4248,12 +4344,11 @@ async function fastRender(){
     if(encError) throw encError;
     st('אורזת את הקובץ…');
     flushParts(true);
+    /* שני המסלולים כבר נארזו וכתבו לדיסק תוך כדי; כאן רק מחברים */
     let blob, ext;
-    if(MP4 && avcC){
-      // הקטעים כבר נארזו תוך כדי; כאן רק מחברים אותם
-      blob = new Blob(fileParts, {type:'video/mp4'});
-      ext = 'mp4';
-    } else {
+    if(MP4 && avcC){ blob = new Blob(fileParts, {type:'video/mp4'}); ext = 'mp4'; }
+    else if(!MP4 && fileParts.length){ blob = new Blob(fileParts, {type:'video/webm'}); ext = 'webm'; }
+    else {
       blob = buildWebm({width:W, height:H, durationMs:(b-a)*1000,
         videoChunks, audioChunks, opusHead: makeOpusHead(1,48000)});
       ext = 'webm';
