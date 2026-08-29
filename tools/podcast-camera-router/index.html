@@ -178,7 +178,7 @@ progress{width:100%;height:8px;border-radius:99px;overflow:hidden}
 <div class="wrap">
 
 <header>
-  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 66</span></h1>
+  <h1>ניתוב מצלמות לפודקאסט <span id="appVer" style="font-size:.8rem;font-weight:600;color:var(--ink40);vertical-align:middle">גרסה 67</span></h1>
   <p>מחברת כל דובר למצלמה ולמיקרופון שלו, ומחליטה אוטומטית מי על המסך בכל רגע — לפי מי מדבר. הכול רץ בדפדפן שלך; שום קובץ לא נשלח לשום שרת.</p>
 </header>
 
@@ -3913,6 +3913,7 @@ async function fastRender(){
       }
       const ad = new AudioData({format:'f32-planar', sampleRate:SR, numberOfFrames:n,
         numberOfChannels:1, timestamp:Math.round((t-a)*1e6), data:mix});
+      lastAudioTs = (t - a) + len;
       aenc.encode(ad);
       /* AudioData מחזיק זיכרון מחוץ לערמת ה-JS. בלי סגירה מפורשת
          דלפו כאן מאות מגה־בייטים בפרק שלם. */
@@ -4095,6 +4096,7 @@ async function fastRender(){
        והקובץ יוצא חלק. */
     if(camsAll.some(c => c.file && c.file.size > 800*1048576)) SPEED = 1;
     let maxLagSeen = 0, skippedDesync = 0, engineUsed = 'לכידת מסך';
+    let expectFrames = 0, lastAudioTs = 0;
     /* בחירת מנוע. הדרך הישנה לכדה את מה שהדפדפן הספיק להציג על המסך —
        ולכן החותמות נגררו אחרי התוכן במחשב עמוס ("הפה זז אחרי הסאונד"),
        והמהירות הוגבלה לקצב המסך. כשהמצלמות הן MP4 שנפתח במפענח,
@@ -4195,6 +4197,7 @@ async function fastRender(){
       const keyEveryT = TFPS * 3;
       try{
         const nTicks = Math.max(1, Math.round((b - a) * TFPS));
+        expectFrames = nTicks;
         for(let k = 0; k < nTicks; k++){
           if(stopReq) break;
           const t = a + k / TFPS;
@@ -4370,10 +4373,23 @@ async function fastRender(){
       v.src = u;
     });
     // עצירה יזומה מייצרת קובץ קצר בכוונה — זה לא כשל
-    if(!stopReq && got >= 0 && isFinite(got) && Math.abs(got - want) > Math.max(2, want*0.1))
+    /* סובלנות של 10% היא 5 דקות בפרק של שעה — קובץ קטוע היה עובר
+       אותה ונמסר בתור "מוכן". 2% או 2 שניות, הגדול מביניהם. */
+    if(!stopReq && got >= 0 && isFinite(got) && Math.abs(got - want) > Math.max(2, want*0.02))
       throw new Error(`הקובץ יצא באורך ${fmtDur(got)} במקום ${fmtDur(want)} ` +
         `(${frames} פריימים נקלטו, ${skipped} נדחו). הדרך המהירה לא מתאימה לקבצים האלה — ` +
         `מעכשיו הכלי יעבור אוטומטית לדרך האמינה: לוקחת כאורך הפרק, אותו MP4 בדיוק.`);
+    /* במנוע הפענוח הישיר כל טיק אמור להפיק פריים אחד. פער אמיתי כאן
+       פירושו שקטעים מהפרק פשוט לא נכנסו לקובץ — וזה לא נבדק קודם
+       בכלל, כי בדיקת האורך לבדה לא רואה פריימים חסרים. */
+    if(!stopReq && expectFrames && frames < expectFrames*0.98)
+      throw new Error(`נוצרו ${frames} פריימים במקום ${expectFrames} — ` +
+        `${Math.round((1-frames/expectFrames)*100)}% מהפרק לא נכנסו לקובץ. ` +
+        `הקובץ לא נמסר כי הוא היה חסר.`);
+    /* והקול: אם הוא מסתיים לפני התמונה, סוף הפרק יוצא אילם. */
+    if(!stopReq && lastAudioTs && lastAudioTs < want - Math.max(1, want*0.01))
+      throw new Error(`רצועת הקול מסתיימת ב-${fmtDur(lastAudioTs)} במקום ${fmtDur(want)} — ` +
+        `סוף הפרק היה יוצא בלי קול, ולכן הקובץ לא נמסר.`);
     if(maxLagSeen > 0.8 || skippedDesync > (frames+skippedDesync)*0.2)
       throw new Error(`המצלמות לא הצליחו להישאר צמודות לזמן (פיגור מרבי ` +
         `${maxLagSeen.toFixed(1)}ש׳, ${skippedDesync} פריימים נדחו) — קובץ כזה יוצא ` +
